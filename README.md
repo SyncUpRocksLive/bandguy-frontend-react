@@ -46,10 +46,14 @@ This repository contains the React frontend SPA for local development and testin
   npm run storybook
 
 ## Contributing
-- Pull requests welcome - must agree to code committer requirements
 - Use `npm run dev` for local development
 - Keep experiments in separate branches
 - Storybook components should be documented with examples
+
+## Commnuity
+
+[![Discord](https://img.shields.io/badge/Discord-Join%20the%20Jam%20%F0%9F%8E%B6-%235865F2.svg)](https://discord.gg/YTxrm3M93A)
+
 
 ## License
 GPL-3.0 License — see LICENSE file for details.
