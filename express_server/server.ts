@@ -6,6 +6,8 @@ import { useSets } from './controller-sets';
 import { useLogin } from './controller-login';
 var cookieParser = require('cookie-parser')
 
+const PORT: number = parseInt(process.env.PORT || '9000', 10);
+
 const app: Express = express();
 
 app.use(json());
@@ -25,7 +27,7 @@ app.get('/health', (req, res) => {
 	res.status(200).send('OK');
 });
 
-const server = app.listen(9001, '0.0.0.0',() => console.log('Example app is listening on port 9001.'));
+const server = app.listen(PORT, '0.0.0.0',() => console.log(`Example app is listening on port ${PORT}.`));
 
 // Function to handle the actual cleanup
 const gracefulShutdown = (signal: string) => {

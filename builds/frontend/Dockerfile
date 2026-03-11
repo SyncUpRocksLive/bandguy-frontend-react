@@ -34,5 +34,5 @@ COPY builds/frontend/nginx.conf /etc/nginx/conf.d/default.conf
 # Copy the built files from the builder stage
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-EXPOSE 80
+EXPOSE 9000
 CMD ["nginx", "-g", "daemon off;"]
