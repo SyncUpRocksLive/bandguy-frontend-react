@@ -17,12 +17,13 @@ function getMessageQueue(user:string) {
 }
 
 export function useMessages(app: core.Express) {
-	app.get('/message/read/:name', (req, res) => {
+	app.post('/message/read', (req, res) => {
+		const name = (req as any).currentUser
 		const response = {
-			messages: getMessageQueue(req.params.name),
+			messages: getMessageQueue(name),
 			date: 'hi!'
 		}
-		message_queue[req.params.name] = []
+		message_queue[name] = []
 		res.send(response);
 	});
 

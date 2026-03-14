@@ -14,8 +14,7 @@ const MessageChannelService = () => {
 			return;
 		}
 
-		const user = store.user;
-		const response = await Messages.getMessages(user.username);
+		const response = await Messages.getMessages();
 		if (response.messages.length > 0) {
 			LogInfo(`MessageChannelService: Rx'd ${response.messages.length} new messages`);
 			BroadcastMessage({data: {type: MessageBusActionType.MESSAGE, message: response.messages}})

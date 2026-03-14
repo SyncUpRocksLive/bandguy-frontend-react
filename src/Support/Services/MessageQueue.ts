@@ -6,8 +6,8 @@ export interface MessageResponse {
 }
 
 export class Messages {
-	static async getMessages(user:string) {
-		const data = await fetch(`/api/message/read/${user}`, { method: "GET", headers: { "Content-Type": "application/json" }});
+	static async getMessages() {
+		const data = await fetch(`/api/message/read`, { method: "POST", headers: { "Content-Type": "application/json" }});
 		const json: MessageResponse = await data.json()
 		return json;
 	}
