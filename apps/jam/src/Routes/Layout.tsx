@@ -14,7 +14,7 @@ const Layout = () => {
 
 	const { isLoading } = useQuery(['login.state'], async () => {
 		Log('verbose', 'Checking login state...');
-		const data = await fetch(`/api/user/loggedin`, { method: "GET", headers: { "Content-Type": "application/json" }});
+		const data = await fetch(`/api/user/auth/loggedin`, { method: "GET", headers: { "Content-Type": "application/json" }});
 		Log('verbose', `Checking login state... ${data}`);
 		if (data.status !== 200) {
 			return {};

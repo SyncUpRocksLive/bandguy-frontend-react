@@ -12,9 +12,8 @@ This repository contains the React frontend SPA for local development and testin
 - Sample login/signout for testing
 
 ## Repo Structure
-- `/src` – Main React app components and logic
+- `/apps` – Each subfolder is a SPA of its own. Instead of one massive SPA, hard to deploy, edit, and large memory/download footprint - break major app areas into their own SPAs. For instance, user profile editing has nothing at all to do with jamming. And, we can unload jam SPA when going to edit user profile, or in track builder modes.
 - `/public` – Static assets
-- `/express_server` – Local API stub for WebRTC signaling & sample login (only for local dev testing)
 - `/tests` – Component/unit tests
 - `.storybook` – Storybook UI component explorer
 - `vite.config.ts` – Vite build configuration

@@ -1,26 +1,41 @@
-/// <reference types="vitest" />
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import path from 'path'
+import { defineConfig } from 'vite';
+import path from 'path';
 
-// https://vitejs.dev/config/
 export default defineConfig({
-	plugins: [react()],
-	server: {
-		port: 9000,
-		proxy: {
-			'/api': {
-				target: 'http://localhost:9001',
-				changeOrigin: true,
-				rewrite: (path) => path.replace(/^\/api/, ''),
-			},
-		},
-	},
-	resolve: {
-		alias: {
-			"@": path.resolve(__dirname, "./src"),
-		},
-	},
-	test: {
-	},
-})
+  // Tell Vite the "Source of Truth" for the landing page is the /public folder
+  root: 'public',
+  
+  server: {
+    port: 9000,
+    strictPort: true,
+    proxy: {
+      // 1. Send /jam traffic to the React App dev server (on 5173)
+      '/jam': {
+        target: 'http://localhost:5173',
+        changeOrigin: true,
+        ws: true // Crucial for WebRTC signals/WebSockets
+      },
+      
+      // 2. Send /profile traffic to the Profile App dev server (on 5174)
+      '/profile': {
+        target: 'http://localhost:5174',
+        changeOrigin: true,
+        ws: true
+      },
+
+      // 3. Send /api traffic to your .NET API (on 9001)
+      '/api': {
+        target: 'http://localhost:9001',
+        changeOrigin: true,
+        secure: false
+      }
+    }
+  },
+
+  resolve: {
+    alias: {
+      // Allows your static scripts to reference shared logic if needed
+      '@shared': path.resolve(__dirname, './packages/shared/src'),
+    }
+  }
+});

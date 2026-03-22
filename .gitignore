@@ -1,3 +1,7 @@
+public/jam/
+public/profile/
+public/song_editor/
+
 *.lrc
 *.json
 *.mp3
