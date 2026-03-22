@@ -1,6 +1,6 @@
 import { pickStore } from '@/Support/Stores/PrimaryStore';
 import { PeerOperationMode } from '@/Support/Stores/Types';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import HostModeStatus from './HostModeStatus';
 import GuestModeStatus from './GuestModeStatus';
 import UserProfile from './UserProfile';
@@ -16,7 +16,7 @@ function TopNavBar() {
 	return (
 		<header>
 			<div style={{padding: '3px 10px 0 10px', width: '100%', display: 'flex', flexDirection: 'row', color: 'white', background: 'rgba(155,155,155,.1)', justifyContent: 'center', alignItems: 'center'}}>
-				<Link to='/'>Bandguy</Link>
+				<Link to='/jam'>JAM HOME</Link>
 				
 				<div style={{userSelect: 'none',}}>
 					{` - ${peerMode}`}

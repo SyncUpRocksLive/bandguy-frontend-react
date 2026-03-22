@@ -20,28 +20,29 @@ const FollowerService = () => {
 	const flow = useRef<IRemoteClientConnectionFlow>(new ConnectFlow(setConnectState));
 
 	// We are watching remote, available channels here
-	useQuery(['channel.list'], async () => {
-		const newChannels = await JamChannels.getChannelList();
-		const otherChannels = Object.keys(newChannels)
-			.filter((k) => k !== user!.username)
-			.map((k) => newChannels[k].sort((a, b) => a.timestamp - b.timestamp))
-			.flat();
+	useQuery({
+		queryKey: ['channel.list'],
+		queryFn: async () => {
+			const newChannels = await JamChannels.getChannelList();
+			const otherChannels = Object.keys(newChannels)
+				.filter((k) => k !== user!.username)
+				.map((k) => newChannels[k].sort((a, b) => a.timestamp - b.timestamp))
+				.flat();
 
-		let changed = false;
-		const currentLength = availableRemoteChannels?.length ?? 0;
-		if (currentLength !== otherChannels.length) {
-			changed = true;
-		} else if (availableRemoteChannels && currentLength > 0) {
-			changed = !availableRemoteChannels.every((x) => otherChannels.find((y) => y.identifier === x.identifier));
-		}
+			let changed = false;
+			const currentLength = availableRemoteChannels?.length ?? 0;
+			if (currentLength !== otherChannels.length) {
+				changed = true;
+			} else if (availableRemoteChannels && currentLength > 0) {
+				changed = !availableRemoteChannels.every((x) => otherChannels.find((y) => y.identifier === x.identifier));
+			}
 
-		if (changed) {
-			LogInfo('FollowerService: Remote Channels Changed');
-			dispatch({type: ActionType.UPDATE, update: {availableRemoteChannels: otherChannels}});
-		}
-		return otherChannels;
-	},
-	{
+			if (changed) {
+				LogInfo('FollowerService: Remote Channels Changed');
+				dispatch({type: ActionType.UPDATE, update: {availableRemoteChannels: otherChannels}});
+			}
+			return otherChannels;
+		},
 		refetchInterval: 2000,
 		refetchOnMount: false,
 		refetchOnWindowFocus: false,

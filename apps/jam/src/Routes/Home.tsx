@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Button } from "react-bootstrap"
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router"
 import { dispatch, pickStore } from '@/Support/Stores/PrimaryStore';
 import { ActionType, PeerOperationMode } from '@/Support/Stores/Types';
 import { Log, LogError } from "@/Support/Utilities/Logger";
@@ -27,9 +27,9 @@ const Home = () => {
 
 	return (
 		<div>
-			<Button onClick={() => navigate('/solo/sets')}>Jam Solo</Button>
-			<Button onClick={() => navigate('/host/sets')}>Lead a band!</Button>
-			<Button onClick={() => navigate('/guest')}>Join a band!</Button>
+			<Button onClick={() => navigate('solo/sets')}>Jam Solo</Button>
+			<Button onClick={() => navigate('host/sets')}>Lead a band!</Button>
+			<Button onClick={() => navigate('guest')}>Join a band!</Button>
 		</div>
 	)
 }

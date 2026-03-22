@@ -1,4 +1,4 @@
-export let LogMode: 'verbose'|'info'|'error' = 'info';
+export let LogMode: 'verbose'|'info'|'error' = 'verbose';
 
 const logColors = {
 	'verbose': 'green',
@@ -8,7 +8,7 @@ const logColors = {
 
 export const LogVerbose = (message: string) => {
 	if (LogMode === 'verbose') {
-		console.log(`%VERBOSE: %c${message}`, `color: ${logColors['verbose']};`, 'color: inherit;');
+		console.log(`%cVERBOSE: %c${message}`, `color: ${logColors['verbose']};`, 'color: inherit;');
 	}
 }
 

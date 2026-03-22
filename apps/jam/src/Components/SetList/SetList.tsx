@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from 'react-bootstrap';
 import { SetQueryResponse } from './Types';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { useEffect } from 'react';
 import { dispatch } from '@/Support/Stores/PrimaryStore';
 
@@ -27,15 +27,16 @@ const SetList = ({mode}:IProp) => {
 		}
 	}, [mode]);
 
-	const { data, isLoading } = useQuery(['my.setlist'], async () => {
-		const data = await fetch(`/api/sets`, { method: "GET", headers: { "Content-Type": "application/json" }});
-		const json: SetQueryResponse = await data.json()
-		return json.sets;
-	},
-	{
+	const { data, isLoading } = useQuery({
+		queryKey: ['my.setlist'],
+		queryFn: async () => {
+			const data = await fetch(`/api/sets`, { method: "GET", headers: { "Content-Type": "application/json" }});
+			const json: SetQueryResponse = await data.json()
+			return json.sets;
+		},
 		refetchInterval: 60000,
 		staleTime: 60000,
-		cacheTime: 60000,
+		// TODO ??? cacheTime: 60000,
 		refetchOnMount: true,
 		refetchOnWindowFocus: true,
 		enabled: true,

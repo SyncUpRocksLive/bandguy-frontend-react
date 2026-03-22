@@ -1,5 +1,6 @@
 // Forked REPO https://github.com/pjcast/react-superstore.git
-import createStore from 'react-superstore'
+//import createStore from 'react-superstore'
+import { createStore } from 'react-superstore'
 import { PeerOperationMode, SongPlayStatus, StoreItems } from './Types';
 import { PrimaryStoreReducer } from './PrimaryStoreReducer';
 

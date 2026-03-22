@@ -7,8 +7,8 @@ import path from 'path'
 export default defineConfig({
 	base: '/jam/', // Crucial for asset paths in the browser
 	build: {
-    outDir: '../../public/jam', // Drops the built files into your Nginx root
-    emptyOutDir: true
+    	outDir: '../../public/jam', // Drops the built files into your Nginx root
+    	emptyOutDir: true
   	},
 	plugins: [react()],
     server: {
@@ -37,11 +37,10 @@ export default defineConfig({
     resolve: {
         alias: {
             "@": path.resolve(__dirname, "./src"),
-            // 5. Add your shared package alias here too!
             "@shared": path.resolve(__dirname, "../../packages/shared/src"),
         },
-    },
-    test: {
-        environment: 'jsdom', // Standard for React testing
-    },
+    }//,
+    //test: {
+    //    environment: 'jsdom', // Standard for React testing
+    //},
 })

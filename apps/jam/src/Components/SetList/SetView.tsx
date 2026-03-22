@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { Button } from "react-bootstrap";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import { SongOverview } from "@/Types/Sets/SetOverview";
 import { TrackFormat } from "@/Types/Sets/SongDetail";
 import SongView from "./SongView";
@@ -34,81 +34,83 @@ const SetView = ({mode}:IProp) => {
 		}
 	}, [mode, setId, currentSetId]);
 
-	const { data, isLoading } = useQuery(['setlist', currentSetId], async () => {
-		const data = await fetch(`/api/sets`, { method: "GET", headers: { "Content-Type": "application/json" }});
-		const json: SetQueryResponse = await data.json()
-		return json.sets.find((s) => s.id === currentSetId);
-	},
-	{
+	const { data, isLoading } = useQuery({
+		queryKey: ['setlist', currentSetId],
+		queryFn: async () => {
+			const data = await fetch(`/api/sets`, { method: "GET", headers: { "Content-Type": "application/json" }});
+			const json: SetQueryResponse = await data.json()
+			return json.sets.find((s) => s.id === currentSetId);
+		},
 		refetchInterval: 60000,
 		staleTime: 60000,
-		cacheTime: 60000,
+		// TODO: ?? cacheTime: 60000,
 		refetchOnMount: false,
 		refetchOnWindowFocus: false,
 		enabled: currentSetId !== undefined,
 	});
 
-	const { data: trackData, isLoading: loadingTracks } = useQuery(['song.track', currentSongId], async () => {
-		if (!data) {
-			throw Error('Invalid Set State');
-		}
+	const { data: trackData, isLoading: loadingTracks } = useQuery({
+		queryKey: ['song.track', currentSongId],
+		queryFn: async () => {
+			if (!data) {
+				throw Error('Invalid Set State');
+			}
 
-		const set = data;
-		const song = currentSongId;
+			const set = data;
+			const song = currentSongId;
 
-		LogInfo(`Downloading track information for ${set.id}/${song}`);
-		const tracksDetailResponse = await fetch(`/api/sets/${set.id}/${song}`, { method: "GET", headers: { "Content-Type": "application/json" }});
-		if (!tracksDetailResponse.ok) {
-			throw Error(`Invalid Set Track '${song}' - no track data!`);
-		}
+			LogInfo(`Downloading track information for ${set.id}/${song}`);
+			const tracksDetailResponse = await fetch(`/api/sets/${set.id}/${song}`, { method: "GET", headers: { "Content-Type": "application/json" }});
+			if (!tracksDetailResponse.ok) {
+				throw Error(`Invalid Set Track '${song}' - no track data!`);
+			}
 
-		const songDetails: SongDetailResponse = await tracksDetailResponse.json();
-		if (!data) {
-			throw Error(`Invalid Set Track '${song}' - no track data!`);
-		}
+			const songDetails: SongDetailResponse = await tracksDetailResponse.json();
+			if (!data) {
+				throw Error(`Invalid Set Track '${song}' - no track data!`);
+			}
 
-		// TODO: Ensure all tracks have times
-		songDetails.duration = 1000 * 60 * 5;
-		if (songDetails.length) {
-			// 
-		}
+			// TODO: Ensure all tracks have times
+			songDetails.duration = 1000 * 60 * 5;
+			if (songDetails.length) {
+				// 
+			}
 
-		songDetails.tracks.forEach(async (t) => {
-			// Check if file already found...
-			if (!(await songStore.exists(song!, t.id))) {
-				LogInfo(`Downloading track information for ${set.id}/${song}/${t.id} ${t.description}`);
-				let trackUrl = `/api/sets/${set.id}/${song}/${t.id}`;
-				if (t.format === TrackFormat.Lyric) {
-					trackUrl += '.lrc';
-					const trackResponse = await fetch(trackUrl, { method: "GET", headers: { 'pragma': 'no-cache', 'cache-control': 'no-store', 'cache': 'no-store' }});
-					if (trackResponse.ok) {
-						const track = await trackResponse.blob();
-						if (!data) {
-							throw Error(`Invalid Set Track '${song}' - no track data!`);
+			songDetails.tracks.forEach(async (t) => {
+				// Check if file already found...
+				if (!(await songStore.exists(song!, t.id))) {
+					LogInfo(`Downloading track information for ${set.id}/${song}/${t.id} ${t.description}`);
+					let trackUrl = `/api/sets/${set.id}/${song}/${t.id}`;
+					if (t.format === TrackFormat.Lyric) {
+						trackUrl += '.lrc';
+						const trackResponse = await fetch(trackUrl, { method: "GET", headers: { 'pragma': 'no-cache', 'cache-control': 'no-store', 'cache': 'no-store' }});
+						if (trackResponse.ok) {
+							const track = await trackResponse.blob();
+							if (!data) {
+								throw Error(`Invalid Set Track '${song}' - no track data!`);
+							}
+
+							LogInfo(`Downloaded ${trackUrl}`);
+							await songStore.put({
+								data: track,
+								format: t.format,
+								songId: song!,
+								trackId: t.id,
+								timestamp: 1
+							})
 						}
-
-						LogInfo(`Downloaded ${trackUrl}`);
-						await songStore.put({
-							data: track,
-							format: t.format,
-							songId: song!,
-							trackId: t.id,
-							timestamp: 1
-						})
+					} else {
+						LogError(`Unsupported Track Format: ${t.format}`);
 					}
 				} else {
-					LogError(`Unsupported Track Format: ${t.format}`);
+					Log('verbose', `Found in cache: ${set.id}/${song}/${t.id} ${t.description}`);
 				}
-			} else {
-				Log('verbose', `Found in cache: ${set.id}/${song}/${t.id} ${t.description}`);
-			}
-		});
+			});
 
-		return songDetails;
-	},
-	{
+			return songDetails;
+		},
 		staleTime: Infinity,
-		cacheTime: Infinity,
+		// TODO: cacheTime: Infinity,
 		refetchOnMount: false,
 		refetchOnWindowFocus: false,
 		enabled: currentSongId !== undefined && data != null,
