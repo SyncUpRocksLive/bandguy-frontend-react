@@ -1,5 +1,5 @@
 import { Lyric, Line, Word, LyricFormatVersion } from '../../Types/Lyrics';
-import { LogError } from './Logger';
+import { Log, LogError, LogObject } from './Logger';
 
 function parseLegacy(lyric: Lyric, lyricLine: string, timePositions:number[]) {
 	lyricLine = lyricLine.trim();
@@ -243,6 +243,11 @@ export function lyricsParser(lrc:string) {
 
 	// Determine total duration
 	// TODO: Support tag length for total duration - and only adjust if < expected duration
+	LogObject('verbose', 'Parsed Lyrics Result', result);
+	if (result.lines.length === 0) {
+		LogError(`Lyric File has no valid lines: ${lrc}`);
+		return result;
+	}
 	const lastLine = result.lines[result.lines.length - 1];
 	result.duration = lastLine.time + lastLine.duration;
 

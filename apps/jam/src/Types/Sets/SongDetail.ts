@@ -1,7 +1,6 @@
 
 export enum TrackType {
-	LeadVocals = 'LeadVocals',
-	VocalsGuitar = 'VocalsGuitar',
+	Guitar = 'Guitar',
 	Vocals = 'Vocals',
 	RhythmGuitar = 'RhythmGuitar',
 }
@@ -13,9 +12,24 @@ export enum TrackFormat {
 	Text = 'Text,'
 }
 
-export interface SongTrack {
-	id: string;
+export interface Track {
+	id: number;
+	songId: number;
+	fileSetId: number;
+	name: TrackType;
 	type: TrackType;
 	format: TrackFormat;
-	description: string; // Lead, Solo, Guitar, Bass, Duet
+	createdAt: number;
+	versionNumber: number;
+	configuration?: string;
+}
+
+export interface Song {
+	id: number;
+	ownerId: string;
+	name: string;
+	durationMilliseconds: number;
+	createdAt: number;
+	configuration?: string;
+	tracks: Track[];
 }

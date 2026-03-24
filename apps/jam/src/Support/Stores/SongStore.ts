@@ -2,8 +2,8 @@ import { TrackFormat } from "@/Types/Sets/SongDetail";
 import { Log, LogError, LogInfo } from "../Utilities/Logger";
 
 export interface SongBlob {
-	songId: string;
-	trackId: string;
+	songId: number;
+	trackId: number;
 	format: TrackFormat;
 	timestamp: number;
 	data: Blob;
@@ -12,8 +12,8 @@ export interface SongBlob {
 export interface ISongStore {
 	// Does not need to be called explicitly.
 	initialize:() => Promise<undefined>;
-	exists:(songId: string, trackId: string) => Promise<boolean>;
-	get:(songId: string, trackId: string) => Promise<SongBlob | undefined>;
+	exists:(songId: number, trackId: number) => Promise<boolean>;
+	get:(songId: number, trackId: number) => Promise<SongBlob | undefined>;
 	put:(song: SongBlob) => Promise<undefined>;
 }
 
@@ -72,7 +72,7 @@ export function getSongStore():ISongStore {
 		});
 	};
 
-	const exists = (songId: string, trackId: string): Promise<boolean> => {
+	const exists = (songId: number, trackId: number): Promise<boolean> => {
 		console.log('Checking exists..');
 		return new Promise<boolean>((resolve, reject) => {
 			initialize().then(() => {
@@ -90,7 +90,7 @@ export function getSongStore():ISongStore {
 		});
 	};
 
-	const get = async (songId: string, trackId: string): Promise<SongBlob | undefined> => {
+	const get = async (songId: number, trackId: number): Promise<SongBlob | undefined> => {
 		return new Promise<SongBlob | undefined>((resolve, reject) => {
 			initialize().then(() => {
 				const transaction = _songStoreCache.database!.transaction('trackData', 'readwrite');

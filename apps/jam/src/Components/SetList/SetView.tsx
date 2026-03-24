@@ -1,14 +1,14 @@
 import { PlayIcon, PauseIcon, SkipIcon } from "@/Constants/AppIcons";
 import { dispatch, pickStore } from "@/Support/Stores/PrimaryStore";
 import { ActionType, PeerOperationMode, SongPlayStatus } from "@/Support/Stores/Types";
-import { Log, LogError, LogInfo } from "@/Support/Utilities/Logger";
+import { Log, LogError, LogInfo, LogVerbose } from "@/Support/Utilities/Logger";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { Button } from "react-bootstrap";
 import { useParams } from "react-router";
 import { SetOverview, SongOverview } from "@/Types/Sets/SetOverview";
-import { TrackFormat } from "@/Types/Sets/SongDetail";
+import { Song, TrackFormat } from "@/Types/Sets/SongDetail";
 import SongView from "./SongView";
 import { ApiResponseBase } from "./Types";
 import { getSongStore } from "@/Support/Stores/SongStore";
@@ -25,7 +25,7 @@ const SetView = ({mode}:IProp) => {
 	useEffect(() => {
 		const timeout = setTimeout(() => {
 			if (mode !== PeerOperationMode.Guest) {
-				dispatch({type: ActionType.UPDATE, update: {currentSetId: setId, peerMode: mode}});
+				dispatch({type: ActionType.UPDATE, update: {currentSetId: parseInt(setId, 10), peerMode: mode}});
 			}
 		}, 1);
 
@@ -37,9 +37,12 @@ const SetView = ({mode}:IProp) => {
 	const { data, isLoading } = useQuery({
 		queryKey: ['setlist', currentSetId],
 		queryFn: async () => {
-			const data = await fetch(`/api/legacy/sets`, { method: "GET", headers: { "Content-Type": "application/json" }});
+			LogVerbose(`Downloading set overview for setId=${currentSetId}`);
+			const data = await fetch(`/api/legacy/user/sets/overview`, { method: "GET", headers: { "Content-Type": "application/json" }});
 			const response: ApiResponseBase<SetOverview[]> = await data.json();
-			return response.Data?.find((s) => s.id === currentSetId);
+			const matchedSet = response.data?.find((s) => s.id === currentSetId);
+			LogVerbose(`matchedSet=${matchedSet}`)
+			return matchedSet;
 		},
 		refetchInterval: 60000,
 		staleTime: 60000,
@@ -59,30 +62,23 @@ const SetView = ({mode}:IProp) => {
 			const set = data;
 			const song = currentSongId;
 
-			LogInfo(`Downloading track information for ${set.id}/${song}`);
-			const tracksDetailResponse = await fetch(`/api/sets/${set.id}/${song}`, { method: "GET", headers: { "Content-Type": "application/json" }});
+			LogInfo(`Downloading track information for songId=${song}`);
+			const tracksDetailResponse = await fetch(`/api/legacy/user/song/${song}`, { method: "GET", headers: { "Content-Type": "application/json" }});
 			if (!tracksDetailResponse.ok) {
 				throw Error(`Invalid Set Track '${song}' - no track data!`);
 			}
 
-			const songDetails: SongDetailResponse = await tracksDetailResponse.json();
-			if (!data) {
+			const songDetails: ApiResponseBase<Song> = await tracksDetailResponse.json();
+			if (!songDetails || !songDetails.data) {
 				throw Error(`Invalid Set Track '${song}' - no track data!`);
 			}
 
-			// TODO: Ensure all tracks have times
-			songDetails.duration = 1000 * 60 * 5;
-			if (songDetails.length) {
-				// 
-			}
-
-			songDetails.tracks.forEach(async (t) => {
+			songDetails.data.tracks.forEach(async (t) => {
 				// Check if file already found...
 				if (!(await songStore.exists(song!, t.id))) {
-					LogInfo(`Downloading track information for ${set.id}/${song}/${t.id} ${t.description}`);
-					let trackUrl = `/api/sets/${set.id}/${song}/${t.id}`;
+					LogInfo(`Downloading track information for ${set.id}/${song}/${t.id} ${t.name}`);
+					let trackUrl = `/api/legacy/user/song/track/${t.id}/data`;
 					if (t.format === TrackFormat.Lyric) {
-						trackUrl += '.lrc';
 						const trackResponse = await fetch(trackUrl, { method: "GET", headers: { 'pragma': 'no-cache', 'cache-control': 'no-store', 'cache': 'no-store' }});
 						if (trackResponse.ok) {
 							const track = await trackResponse.blob();
@@ -103,7 +99,7 @@ const SetView = ({mode}:IProp) => {
 						LogError(`Unsupported Track Format: ${t.format}`);
 					}
 				} else {
-					Log('verbose', `Found in cache: ${set.id}/${song}/${t.id} ${t.description}`);
+					Log('verbose', `Found in cache: ${set.id}/${song}/${t.id} ${t.name}`);
 				}
 			});
 
@@ -217,7 +213,7 @@ const SetView = ({mode}:IProp) => {
 			<div style={{ flex: '1', background: 'rgba(255,255,255,.2'}}>
 				{loadingTracks && (<div>{`Loading Song ${currentSongId}...`}</div>)}
 				{trackData && song && (
-					<SongView song={song} tracks={trackData.tracks} key={song.id}/>
+					<SongView song={song} tracks={trackData.data!.tracks} key={song.id}/>
 				)}
 			</div>
 		</div>

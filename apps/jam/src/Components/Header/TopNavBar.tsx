@@ -16,7 +16,7 @@ function TopNavBar() {
 	return (
 		<header>
 			<div style={{padding: '3px 10px 0 10px', width: '100%', display: 'flex', flexDirection: 'row', color: 'white', background: 'rgba(155,155,155,.1)', justifyContent: 'center', alignItems: 'center'}}>
-				<Link to='/jam'>JAM HOME</Link>
+				<Link to='/'>JAM HOME</Link>
 				
 				<div style={{userSelect: 'none',}}>
 					{` - ${peerMode}`}

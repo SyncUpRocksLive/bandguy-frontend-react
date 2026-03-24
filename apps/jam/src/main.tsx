@@ -11,6 +11,7 @@ import '@/index.css'
 import '@/App.css'
 import Guest from '@/Components/Guest/Guest.tsx';
 import { PeerOperationMode } from '@/Support/Stores/Types.ts';
+import { basename } from 'node:path';
 
 RegisterIconWithLib();
 
@@ -29,19 +30,19 @@ const router = createBrowserRouter([
 	{
 		element: <Layout />,
 		children: [
-			{ path: "jam/", element: <Home />, },
+			{ path: "", element: <Home />, },
 			// Host
-			{ path: "jam/host/sets", element: <SetList mode={PeerOperationMode.Host} />, },
-			{ path: "jam/host/sets/:setId", element: <SetView mode={PeerOperationMode.Host} />, },
+			{ path: "host/sets", element: <SetList mode={PeerOperationMode.Host} />, },
+			{ path: "host/sets/:setId", element: <SetView mode={PeerOperationMode.Host} />, },
 			// Solo
-			{ path: "jam/solo/sets", element: <SetList mode={PeerOperationMode.Solo}/>, },
-			{ path: "jam/solo/sets/:setId", element: <SetView mode={PeerOperationMode.Solo}/>, },
+			{ path: "solo/sets", element: <SetList mode={PeerOperationMode.Solo}/>, },
+			{ path: "solo/sets/:setId", element: <SetView mode={PeerOperationMode.Solo}/>, },
 			// Guest
-			{ path: "jam/guest", element: <Guest />, },
+			{ path: "guest", element: <Guest />, },
 			{ path:"*", element: <div>404 - Doesn't Exist. These are not the droids you are looking for!</div>}
 		],
 	}
-]);
+], { basename: '/jam/' });
 
 const queryClient = new QueryClient()
 

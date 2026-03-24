@@ -30,8 +30,8 @@ export interface StoreItems {
 	connectedUsers: ConnectedUser[];
 	availableRemoteChannels?: JamChannelDetail[];
 	connectedChannelDetail?: JamChannelDetail;
-	currentSetId?: string;
-	currentSongId?: string;
+	currentSetId?: number;
+	currentSongId?: number;
 	songPlayStatus: SongPlayStatus;
 }
 

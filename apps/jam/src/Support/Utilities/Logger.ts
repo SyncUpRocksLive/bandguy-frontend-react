@@ -28,3 +28,10 @@ export const Log = (mode: 'verbose'|'info'|'error', message: string) => {
 		console.log(`%c${mode.toUpperCase()}: %c${message}`, `color: ${logColors[mode]};`, 'color: inherit;');
 	}
 }
+
+export const LogObject = (mode: 'verbose'|'info'|'error', message: string, obj: any) => {
+	if (LogMode === mode || mode === 'error') {
+		console.log(`%c${mode.toUpperCase()}: %c${message}`, `color: ${logColors[mode]};`, 'color: inherit;');
+		console.table(obj);
+	}
+}

@@ -31,7 +31,7 @@ const SetList = ({mode}:IProp) => {
 		queryKey: ['my.setlist'],
 		queryFn: async () => {
 			Log('verbose', `my.setlist: downloading...`);
-			const data = await fetch(`/api/legacy/sets`, { method: "GET", headers: { "Content-Type": "application/json" }});
+			const data = await fetch(`/api/legacy/user/sets/overview`, { method: "GET", headers: { "Content-Type": "application/json" }});
 			const response: ApiResponseBase<SetOverview[]> = await data.json();
 			Log('verbose', `my.setlist: ${JSON.stringify(response)}`);
 			return response.data ?? [];
@@ -45,8 +45,9 @@ const SetList = ({mode}:IProp) => {
 	});
 
 	const playSet = (set:SetOverview) => {
-		Log('verbose', `Staring set ${set.name}`);
-		navigate(`/${mode}/sets/${set.id}`);
+		const destination = `/${mode.toLowerCase()}/sets/${set.id}`;
+		Log('verbose', `Starting set=${set.name} route=${destination}`);
+		navigate(destination);
 	}
 
 	// const songName = (song: SongOverview) => {

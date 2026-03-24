@@ -5,7 +5,7 @@ import path from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-	base: '/jam/', // Crucial for asset paths in the browser
+	base: '/jam', // Crucial for asset paths in the browser
 	build: {
     	outDir: '../../public/jam', // Drops the built files into your Nginx root
     	emptyOutDir: true
