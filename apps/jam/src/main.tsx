@@ -2,19 +2,17 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { createBrowserRouter, RouterProvider, } from "react-router";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import Layout from '@/Routes/Layout.tsx';
-import SetList from '@/Components/SetList/SetList.tsx';
-import Home from '@/Routes/Home.tsx'
-import { RegisterIconWithLib } from '@/Constants/AppIcons.ts';
-import SetView from '@/Components/SetList/SetView.tsx';
+import Layout from '@/Routes/Layout';
+import SetList from '@/Components/SetList/SetList';
+import Home from '@/Routes/Home'
+import { RegisterIconWithLib } from '@/Constants/AppIcons';
+import SetView from '@/Components/SetList/SetView';
 import '@/index.css'
 import '@/App.css'
-import Guest from '@/Components/Guest/Guest.tsx';
-import { PeerOperationMode } from '@/Support/Stores/Types.ts';
-import { basename } from 'node:path';
+import Guest from '@/Components/Guest/Guest';
+import { PeerOperationMode } from '@/Support/Stores/Types';
 
 RegisterIconWithLib();
-
 
 // Banish any existing service workers (like GoDaddy's)
 if ('serviceWorker' in navigator) {
