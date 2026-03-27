@@ -1,24 +1,29 @@
+import { ApiResponseBase } from '@/Components/SetList/Types';
 import { Message, MessageData } from '@/Types/Message';
 import { getUnixTime } from 'date-fns'
-
-export interface MessageResponse {
-	messages: Message[];
-}
+import { LogError } from '../Utilities/Logger';
 
 export class Messages {
 	static async getMessages() {
 		const data = await fetch(`/api/legacy/message/read`, { method: "POST", headers: { "Content-Type": "application/json" }});
-		const json: MessageResponse = await data.json()
-		return json;
+		const response: ApiResponseBase<Message[]> = await data.json()
+		if (response.success)
+			return response.data!;
+
+		LogError(`Failed to get messages: ${response.errorMessage}`);
+		return []
 	}
 
-	static async sendMessage(to:string, from:string, data: MessageData) {
+	static async sendMessage(toUserId:string, data: MessageData) {
 		const msg: Message = {
-			to,
-			from,
+			toUserId: toUserId,
+			// Backend will populate - ensuring we cannot lie about who we are
+			fromUserId: '',
+			fromUsername: '',
 			sentUtc: getUnixTime(new Date()),
 			messageData: data
 		};
-		await fetch(`/api/legacy/message/send/${to}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(msg)});
+
+		await fetch(`/api/legacy/message/send`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(msg)});
 	}
 }

@@ -17,12 +17,12 @@ export class JamChannels {
 	}
 
 	static async createChannel(detail: JamChannelDetail) {
-		const data = await fetch(`/api/legacy/channel/create/${detail.hostUser}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(detail)});
+		const data = await fetch(`/api/legacy/channel/create`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(detail)});
 		const json: JamChannelListResponse = await data.json()
 		return json;
 	}
 
 	static async deleteChannel(detail: JamChannelDetail) {
-		await fetch(`/api/legacy/channel/delete/${detail.hostUser}/${detail.identifier}`, { method: "DELETE", headers: { "Content-Type": "application/json" } });
+		await fetch(`/api/legacy/channel/delete/$${detail.identifier}`, { method: "DELETE", headers: { "Content-Type": "application/json" } });
 	}
 }

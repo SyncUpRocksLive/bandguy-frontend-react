@@ -12,7 +12,7 @@ export enum MessageBusActionType {
 
 export type MessageBusEventType = 
 |{ type: MessageBusActionType.MESSAGE, message: Message[] }
-|{ type: MessageBusActionType.KICKOUT, username: string, instance: string }
+|{ type: MessageBusActionType.KICKOUT, userId: string, instance: string }
 |{ type: MessageBusActionType.PEER_CLOSED, client: Client }
 |{ type: MessageBusActionType.STATE_UPDATE, state: StoreItems }
 |{ type: MessageBusActionType.PLAY_CLOCK_TICK, tick: number };

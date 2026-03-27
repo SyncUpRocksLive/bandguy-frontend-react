@@ -35,9 +35,10 @@ export function createClientSignallingChannel(client: Client) {
 		}
 
 		client.state = ConnectState.CONNECTED;
-		if (!store.connectedUsers.find((x) => x.username === client.name)) {
+		if (!store.connectedUsers.find((x) => x.userId === client.userId)) {
 			const existingUsers = store.connectedUsers.map((x) => x);
 			existingUsers.push({
+				userId: client.userId,
 				username: client.name,
 				displayName:  client.name,
 				isBandLeader:  false,

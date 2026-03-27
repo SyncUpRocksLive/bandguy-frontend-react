@@ -17,9 +17,9 @@ const MessageChannelService = () => {
 			}
 
 			const response = await Messages.getMessages();
-			if (response.messages.length > 0) {
-				LogInfo(`MessageChannelService: Rx'd ${response.messages.length} new messages`);
-				BroadcastMessage({data: {type: MessageBusActionType.MESSAGE, message: response.messages}})
+			if (response.length > 0) {
+				LogInfo(`MessageChannelService: Rx'd ${response.length} new messages`);
+				BroadcastMessage({data: {type: MessageBusActionType.MESSAGE, message: response}})
 			}
 			return response;
 		},

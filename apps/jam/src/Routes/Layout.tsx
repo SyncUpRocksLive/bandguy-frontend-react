@@ -7,6 +7,7 @@ import { Log, LogVerbose } from '@/Support/Utilities/Logger';
 import BandLeaderService from '@/Components/Services/Host/BandLeader';
 import MessageChannelService from '@/Components/Services/MessageChannelService';
 import { useQuery } from '@tanstack/react-query';
+import { ApiResponseBase, LoggedInStatus } from '@/Components/SetList/Types';
 
 const Layout = () => {
 	const { user, peerMode } = pickStore<'user'|'peerMode'>();
@@ -17,22 +18,22 @@ const Layout = () => {
 		queryFn: async () => {
 			Log('verbose', 'Checking login state...');
 			const data = await fetch(`/api/auth/loggedin`, { method: "GET", headers: { "Content-Type": "application/json" }});
-			const json = await data.json();
-			Log('verbose', `Checking login state... ${data.status} ${JSON.stringify(json)}`);
-			if (data.status === 401 || json.data.isLoggedIn === false) {
+			const response: ApiResponseBase<LoggedInStatus> = await data.json();
+			Log('verbose', `Checking login state... ${data.status}`);
+			if (data.status === 401 || response.data.isLoggedIn === false || !response.data.userId || !response.data.username) {
 				Log('verbose', 'Checking login state... Unauthorized');
 				// TODO: Capture logInUrl
 				return {};
 			}
-			else if (!json.success || !json.data || !json.data.userProfileName) {
-				Log('verbose', `Checking login state... unknown failure ${json.errorMessage}`);
+			else if (!response.success) {
+				Log('verbose', `Checking login state... unknown failure ${response.errorMessage}`);
 				// TODO: Capture logInUrl
 				return {};
 			}
 
 			// TODO: Capture logout URL logOutUrl
-			dispatch({type: ActionType.UPDATE, update: { user: { username: json.data.userProfileName, displayName: json.data.userProfileName } }});
-			return json;
+			dispatch({type: ActionType.UPDATE, update: { user: { userId: response.data.userId, displayName: response.data.userProfileName, username: response.data.username } }});
+			return response;
 		},
 		staleTime: Infinity,
 		refetchInterval: 0,

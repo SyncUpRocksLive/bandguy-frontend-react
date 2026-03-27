@@ -11,7 +11,8 @@ export enum ConnectState {
 }
 
 export interface Client {
-	name: string;
+	userId: string;
+	username: string;
 	state: ConnectState;
 	peerConnection?: RTCPeerConnection;
 	peerChannelRealtime?: RTCDataChannel;

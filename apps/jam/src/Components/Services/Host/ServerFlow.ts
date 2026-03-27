@@ -25,11 +25,12 @@ export class ServerFlow implements IHostConnectionFlow, IMessageBusHandler {
 		this._clients = [];
 	}
 
-	private async createClient(name: string, offer: RTCSessionDescription) {
+	private async createClient(username: string, userId:string, offer: RTCSessionDescription) {
 		LogInfo(`HOST: Creating new peer client ${name}`);
 		const client: Client = {
 			state: ConnectState.OFFER,
-			name: name,
+			username: username,
+			userId: userId,
 			peerConnection: new RTCPeerConnection({'iceServers': [{'urls': 'stun:stun.l.google.com:19302'}]}),
 		};
 		this._clients.push(client);
@@ -52,8 +53,8 @@ export class ServerFlow implements IHostConnectionFlow, IMessageBusHandler {
 					return;
 				}
 
-				Log('verbose', `Forwarding onicecandidate ${_store.user!.username} -> ${client.name}`);
-				Messages.sendMessage(client.name, _store.user!.username, {
+				Log('verbose', `Forwarding onicecandidate ${_store.user!.userId} -> ${client.userId}:${client.username}`);
+				Messages.sendMessage(client.userId, {
 					type: MessageDataType.RTCIceCandidate,
 					value: e.candidate!
 				}) // TODO error handling
@@ -81,7 +82,7 @@ export class ServerFlow implements IHostConnectionFlow, IMessageBusHandler {
 		}
 
 		LogInfo('HOST: Sending Answer');
-		Messages.sendMessage(name, _store.user.username, {
+		Messages.sendMessage(userId, {
 			type: MessageDataType.RTCSessionDescription,
 			value: {
 				sdp: answer.sdp!,
@@ -101,21 +102,21 @@ export class ServerFlow implements IHostConnectionFlow, IMessageBusHandler {
 		switch(event.data.type) {
 			case MessageBusActionType.MESSAGE: {
 				event.data.message.forEach((m) => {
-					const existingClient = this._clients.find((x) => x.name === m.from);
+					const existingClient = this._clients.find((x) => x.userId === m.fromUserId);
 
 					if (m.messageData.type === MessageDataType.RTCSessionDescription) {
-						LogInfo(`${m.from} -> ${m.to} Message Type: ${m.messageData.value.type}`);
+						LogInfo(`${m.fromUserId} -> ${m.toUserId} Message Type: ${m.messageData.value.type}`);
 
 						if (m.messageData.value.type === 'offer') {
 							if (!existingClient) {
-								LogInfo(`Got offer from new client ${m.from}`);
-								this.createClient(m.from, m.messageData.value);
+								LogInfo(`Got offer from new client ${m.fromUserId}`);
+								this.createClient(m.fromUsername, m.fromUserId, m.messageData.value);
 							} else {
-								LogInfo(`Got offer from known client ${m.from}??? Ignroing.`);
+								LogInfo(`Got offer from known client ${m.fromUserId}??? Ignroing.`);
 							}
 						}
 					} else if (existingClient && m.messageData.type === MessageDataType.RTCIceCandidate) {
-						LogInfo(`${m.from} -> ${m.to} RTCIceCandidate`);
+						LogInfo(`${m.fromUserId} -> ${m.toUserId} RTCIceCandidate`);
 						existingClient.peerConnection!.addIceCandidate(m.messageData.value);
 					}
 				});
@@ -141,7 +142,7 @@ export class ServerFlow implements IHostConnectionFlow, IMessageBusHandler {
 
 				// Update store
 				const store = getStore();
-				if (store.connectedUsers.find((x) => x.username === client.name)) {
+				if (store.connectedUsers.find((x) => x.userId === client.userId)) {
 					const prunedUsers = store.connectedUsers.reduce((acc:ConnectedUser[], u) => {
 						if (u.client !== client) acc.push(u);
 						return acc;
@@ -152,9 +153,9 @@ export class ServerFlow implements IHostConnectionFlow, IMessageBusHandler {
 				break;
 			}
 			case MessageBusActionType.KICKOUT: {
-				const userName = event.data.username;
+				const userId = event.data.userId;
 				// TODO: Lookup instanceid
-				const existingClient = this._clients.find((x) => x.name === userName);
+				const existingClient = this._clients.find((x) => x.userId === userId);
 				if (existingClient) {
 					// TODO: Cleanup connections
 					existingClient.peerConnection!.close();
@@ -217,7 +218,7 @@ export class ServerFlow implements IHostConnectionFlow, IMessageBusHandler {
 
 		// disconnect clients & cleanup
 		this._clients.forEach((c) => {
-			LogInfo(`HOST: Disconnecting peer ${c.name}`);
+			LogInfo(`HOST: Disconnecting peer ${c.userId}:${c.username}`);
 			if (c.peerConnection) {
 				c.peerConnection.close();
 				deleteClientRealtimChannel(c);

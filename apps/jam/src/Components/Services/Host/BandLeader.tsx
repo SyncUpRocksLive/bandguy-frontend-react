@@ -21,7 +21,7 @@ const BandLeaderService = () => {
 		const channelCreate = async (channel: number) => {
 			Log('info', `Creating new channel : ${username}`);
 			await JamChannels.createChannel({
-				hostUser: username,
+				hostUser: "00000000-0000-0000-0000-000000000000",
 				identifier: channel.toString(),
 				friendlyName: `${username}-${channel}`,
 				timestamp: 0

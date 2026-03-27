@@ -4,6 +4,7 @@ import { JamChannelDetail } from "../Services/JamChannels";
 export interface UserState {
 	displayName: string;
 	username: string;
+	userId: string;
 }
 
 export interface ConnectedUser extends UserState {
