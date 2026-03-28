@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SyncUp Rocks Live! | Backstage Access</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rye&family=Bungee&family=Courier+Prime:wght@400;700&family=Anton&display=swap" rel="stylesheet">
+
+    <style>
+        .bg-tobacco-burst {
+            background: radial-gradient(circle at center, #78350f 0%, #1c1917 70%, #0c0a09 100%);
+        }
+
+        @keyframes tube-warmth {
+            0%, 100% { opacity: 0.3; transform: scale(1); filter: blur(150px); }
+            50% { opacity: 0.6; transform: scale(1.1); filter: blur(180px); }
+        }
+        .animate-tube { animation: tube-warmth 5s ease-in-out infinite; }
+
+        .font-vintage { font-family: 'Rye', serif; }
+        .font-stamp { font-family: 'Bungee', cursive; }
+        .font-manual { font-family: 'Courier Prime', monospace; }
+        .font-impact { font-family: 'Anton', sans-serif; }
+
+        .nitro-grain {
+            background-image: url('https://www.transparenttextures.com/patterns/dark-matter.png');
+            opacity: 0.15;
+        }
+    </style>
+</head>
+<body class="bg-stone-950 font-manual text-stone-300">
+
+<div class="relative min-h-screen w-full overflow-hidden flex flex-col items-center justify-center bg-tobacco-burst">
+  
+  <div class="absolute inset-0 z-0">
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-amber-600/20 rounded-full animate-tube"></div>
+    <div class="absolute inset-0 nitro-grain pointer-events-none"></div>
+  </div>
+
+  <div class="relative z-30 text-center px-6 max-w-5xl">
+    
+    <div class="mb-4">
+       <span class="block text-amber-500 font-manual tracking-[0.4em] text-[10px] uppercase mb-3 opacity-70">Established 2026 // Peer-to-Peer</span>
+       <a href="index.html">
+       <h1 class="font-vintage text-6xl md:text-9xl text-stone-100 drop-shadow-[0_6px_0_#451a03] tracking-tighter mb-2">
+         SyncUp <span class="text-amber-500 italic">Rocks</span>
+       </h1>
+       <div class="inline-block border-y border-stone-800 py-1 px-10">
+          <p class="text-amber-600 font-stamp text-xl md:text-2xl tracking-[0.2em] uppercase">
+            Live!
+          </p>
+       </div>
+       </a> 
+    </div>
+    
+    <p class="text-stone-100 font-manual italic text-sm md:text-base mb-16 tracking-wide">
+      [ STATUS: COMING SOON - STAY TUNED! ]
+    </p>
+
+
+    <div class="flex flex-col items-center">
+      
+
+    </div>
+  </div>
+
+  <div class="absolute -bottom-40 -left-40 w-[600px] h-[600px] bg-amber-900/5 rounded-full blur-[120px] pointer-events-none"></div>
+
+</div>
+
+</body>
+</html>

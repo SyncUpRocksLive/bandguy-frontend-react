@@ -1,24 +1,30 @@
 # Stage 1: Build
-FROM node:20.11.1 AS builder
+FROM node:24-slim AS builder
 
-# Create a symlink so 'python' points to 'python3'
-RUN ln -s /usr/bin/python3 /usr/bin/python
+# Add essential build tools (slim needs these for some npm installs)
+RUN apt-get update && apt-get install -y python3 make g++ && ln -s /usr/bin/python3 /usr/bin/python
 
-WORKDIR /app
+WORKDIR /build
 
-# Copy from the root context
+# 1. Copy root config files first
 COPY package*.json ./
-# 'npm ci' is faster/cleaner for Docker builds than 'npm install' (do not need server side builds)
-RUN npm ci --ignore-scripts 
-
-# Copy the source code from the root
-COPY src/ ./src/
-COPY public/ ./public/ 
-# (Add any other root folders needed for the build, like tsconfig.json)
 COPY tsconfig*.json ./
+
+# 2. Copy the workspace app files (Important: Keep the structure!)
+COPY apps/jam/package*.json ./apps/jam/
+COPY apps/jam/tsconfig*.json ./apps/jam/
+
+# 3. Install ALL dependencies (don't ignore scripts yet, we need the .bin folder)
+# We use --include=dev because we need 'tsc' and 'vite' to build
+RUN npm ci --include=dev
+
+# 4. Now copy the rest of the source code
+COPY public/ ./public/
 COPY vite.config.ts ./
 COPY index.html ./
-COPY LICENSE ./
+COPY apps/jam/src/ ./apps/jam/src/
+COPY apps/jam/vite.config.ts ./apps/jam/
+COPY apps/jam/index.html ./apps/jam/
 
 RUN npm run build
 
@@ -32,7 +38,7 @@ RUN rm /etc/nginx/conf.d/default.conf
 COPY builds/frontend/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copy the built files from the builder stage
-COPY --from=builder /app/dist /usr/share/nginx/html
+COPY --from=builder /build/public /usr/share/nginx/html
 
 EXPOSE 9000
 CMD ["nginx", "-g", "daemon off;"]
