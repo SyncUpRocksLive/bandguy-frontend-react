@@ -1,5 +1,6 @@
 <script lang="ts">
 	// Main mixing room components will be added here
+	import { appState } from './state.svelte';
 </script>
 
 <header id="header">
@@ -12,7 +13,7 @@
 
 <section id="center">
 	<div class="studio-controls">
-		<h3>Mixing Room Studio</h3>
+		<h3>Mixing Room Studio - {appState.settings.name}</h3>
 
 
 		<div class="control-grid">
@@ -40,13 +41,23 @@
 				<div class="icon">🎛️</div>
 				<h4>Mixing Console</h4>
 				<p>Coming soon: Advanced mixing and audio processing tools.</p>
-				<button class="control-btn" disabled>Coming Soon</button>
+				<button class="control-btn" disabled>Coming Soon?</button>
 			</div>
 
 			<div class="control-item">
-				<div class="icon">📊</div>
-				<h4>Analytics</h4>
-				<p>Coming soon: Performance analytics and audience insights.</p>
+				<div class="icon">📋</div>
+				<h4>Notebook</h4>
+				<p>
+					Record and manage scratch notes... favorite songs, setlist ideas,
+					or just jot down thoughts for your next practice session.
+				</p>
+				<button class="control-btn">Open Notes</button>
+			</div>
+
+			<div class="control-item">
+				<div class="icon">📰</div>
+				<h4>News!</h4>
+				<p>Stay updated with the latest news and announcements.</p>
 				<button class="control-btn" disabled>Coming Soon</button>
 			</div>
 		</div>
