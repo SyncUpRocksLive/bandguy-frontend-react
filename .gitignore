@@ -5,6 +5,10 @@ public/song_editor/
 
 *.lrc
 *.mp3
+!package.json
+!package-lock.json
+!**/package.json
+!**/package-lock.json
 
 # Logs
 logs
