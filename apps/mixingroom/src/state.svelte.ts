@@ -24,6 +24,7 @@ class AppState {
 
 	// 2. Volatile state (lost on refresh, e.g., UI toggles, search queries)
 	// TODO: load area from URL hash for deep linking (hash routing)
+	// TODO: Use History API for better back/forward navigation
 	ui = $state({
 		area: 'Home' as ViewArea,
 		isMenuOpen: false,
