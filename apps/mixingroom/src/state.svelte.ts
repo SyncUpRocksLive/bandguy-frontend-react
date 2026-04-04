@@ -8,6 +8,12 @@ interface UserProfile {
 	status: 'online' | 'offline';
 }
 
+export type ViewArea = 'Home' | 'SongLibrary' | 'Setlists' | 'Mixer';
+
+function isValidView(name: string): name is ViewArea {
+	return ['Home', 'SongLibrary', 'Setlists', 'Mixer'].includes(name);
+}
+
 class AppState {
 	// Use the $state rune for reactivity
 	settings = $state<UserProfile>({
@@ -17,7 +23,9 @@ class AppState {
 	});
 
 	// 2. Volatile state (lost on refresh, e.g., UI toggles, search queries)
+	// TODO: load area from URL hash for deep linking (hash routing)
 	ui = $state({
+		area: 'Home' as ViewArea,
 		isMenuOpen: false,
 		searchQuery: '',
 		lastError: null as string | null
@@ -39,6 +47,23 @@ class AppState {
 		//     console.log('Settings saved to storage!');
 		//   });
 		// });
+	}
+
+	setView(name: string) {
+		// No need to update if already on the same view
+		if (name === this.ui.area)  {
+			console.log(`Already on view: ${name}`);
+			return;
+		}
+
+		// Use the type guard
+		if (isValidView(name)) {
+			// TypeScript now knows 'name' is safely a ViewArea
+			console.log(`Switching view to: ${name}`);
+			this.ui.area = name;
+		} else {
+			console.warn(`Invalid view name: ${name}`);
+		}
 	}
 
 	// Methods to update state
