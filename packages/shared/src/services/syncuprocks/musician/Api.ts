@@ -65,7 +65,7 @@ export const getSetComplete = async (setId: number) : Promise<Result<SetComplete
  * @param musicianId Musician Identifier
  * @returns 
  */
-export const getSetsOverview = async (musicianId: number) : Promise<Result<SetOverview[]>> => {
+export const getSetsOverview = async (musicianId: string) : Promise<Result<SetOverview[]>> => {
 	const response = await fetch(`/api/legacy/user/sets/overview/${musicianId}`, { method: "GET", headers: { "Content-Type": "application/json" }});
 	let error = checkHttpResponse(response, `fetching sets overview for musicianId=${musicianId}`);
 	if (error)

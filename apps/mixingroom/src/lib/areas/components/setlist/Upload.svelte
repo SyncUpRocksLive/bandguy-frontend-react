@@ -104,7 +104,7 @@
       {:else if status === "error"}
         {errorMessage}
       {:else}
-        {isDragging ? "Drop to Import" : "Upload .zip Playlist"}
+        {isDragging ? "Drop to Import" : "Import .zip Playlist"}
       {/if}
     </span>
     
