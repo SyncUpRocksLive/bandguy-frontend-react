@@ -58,7 +58,7 @@
 	}
 
 	function getTags(setId: number): string[] {
-		return mockTags[setId] || ['untagged'];
+		return mockTags[setId] || [];
 	}
 
 	function createNewSetlist() {
