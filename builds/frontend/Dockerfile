@@ -33,7 +33,9 @@ COPY apps/mixingroom/src/ ./apps/mixingroom/src/
 COPY apps/mixingroom/vite.config.ts ./apps/mixingroom/
 COPY apps/mixingroom/index.html ./apps/mixingroom/
 
-RUN npm run build
+COPY packages/ ./packages/
+
+RUN npm run build --workspaces
 
 # Stage 2: Production
 FROM nginx:stable-alpine
