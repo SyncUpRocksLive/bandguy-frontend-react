@@ -1,5 +1,4 @@
-// src/state.svelte.ts
-import type { UserState, PeerOperationMode, ConnectedUser, SongPlayStatus, StoreItems } from '@/Types/Types';
+import type { PeerOperationMode, ConnectedUser, SongPlayStatus, StoreItems } from '@/Types/Types';
 import type { MessageBusEvent } from '@/Types/MessageBus';
 
 // Correct UserState interface
@@ -12,6 +11,18 @@ interface UserState {
 interface AppStoreItems extends StoreItems {
 	messageBus: MessageBusEvent[] | null; // TODO: define MessageBus properly
 }
+
+	// {#if appState.store.peerMode === PeerOperationMode.Host}
+	// 	<BandLeaderService />
+	// {/if}
+
+	// {#if appState.store.peerMode === PeerOperationMode.Guest}
+	// 	<FollowerService />
+	// {/if}
+
+	// {#if appState.store.peerMode !== PeerOperationMode.Solo}
+	// 	<MessageChannelService />
+	// {/if}
 
 class AppState {
 	// Global state equivalent to react-superstore

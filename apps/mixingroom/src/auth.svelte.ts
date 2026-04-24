@@ -1,7 +1,6 @@
 import { GetAuthState } from '@shared/services/syncuprocks/auth/Api';
 import type { LoggedInStatus } from '@shared/services/syncuprocks/auth/Types';
 
-// src/auth.svelte.ts
 class AuthService {
 	// Use $state so the UI can react to login changes
 	isAuthenticated = $state<boolean | null>(null); // null = "checking", true, or false

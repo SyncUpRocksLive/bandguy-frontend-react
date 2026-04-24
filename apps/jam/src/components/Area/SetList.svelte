@@ -1,23 +1,11 @@
 <script lang="ts">
 	import { createQuery } from '@tanstack/svelte-query';
-	import { router } from '../Router.svelte';
-	import { appState } from '../State.svelte';
-	import { PeerOperationMode } from '../Types/Types';
+	import { router } from '../../Router.svelte';
+	import { appState } from '../../State.svelte';
+	import { PeerOperationMode } from '../../Types/Types';
 	import { Log } from '@shared/services/Logger';
-// Placeholder types - TODO: import from shared
-interface SetOverview {
-	musicianId: number;
-	id: number;
-	name: string;
-	createdAtMsUtc: number;
-	songs: any[]; // SongOverview[]
-}
-
-interface ApiResponseBase<T> {
-	success: boolean;
-	data?: T;
-	errorMessage?: string;
-}
+	import { getSetsOverview } from '@shared/services/syncuprocks/musician/Api';
+	import type { SetOverview } from '@shared/services/syncuprocks/musician/Types';
 
 	interface Props {
 		mode: 'host' | 'solo';
@@ -25,37 +13,30 @@ interface ApiResponseBase<T> {
 
 	let { mode }: Props = $props();
 
-	// Update peer mode
 	$effect(() => {
 		const peerMode = mode === 'host' ? PeerOperationMode.Host : PeerOperationMode.Solo;
 		appState.setPeerMode(peerMode);
 	});
 
-	const query = createQuery({
+	let query = createQuery(() => ({
 		queryKey: ['my.setlist', appState.store.user?.userId ?? 'none'],
 		queryFn: async () => {
-			if (!appState.store.user?.userId) return [];
-			Log('verbose', `my.setlist: downloading for userId=${appState.store.user.userId}`);
-			const data = await fetch(`/api/legacy/user/sets/overview/${appState.store.user.userId}`, {
-				method: "GET",
-				headers: { "Content-Type": "application/json" }
-			});
-			const response: ApiResponseBase<SetOverview[]> = await data.json();
-			Log('verbose', `my.setlist: ${JSON.stringify(response)}`);
-			return response.data ?? [];
+			console.log("Fetching for user:", appState.store.user?.userId);
+			return await getSetsOverview(appState.store.user!.userId);
 		},
 		refetchInterval: 600000,
 		staleTime: 0,
 		refetchOnMount: 'always',
 		refetchOnWindowFocus: true,
-		enabled: !!appState.store.user?.userId,
-	});
+		enabled: true, //!!appState.store.user?.userId,
+	}));
 
 	function playSet(set: SetOverview) {
 		const route = mode === 'host' ? 'HostSetView' : 'SoloSetView';
 		Log('verbose', `Starting set=${set.name} route=${route}`);
 		router.navigate(route, [set.id.toString()]);
 	}
+
 </script>
 
 <div style="flex: 1; display: flex; flex-direction: column; margin: 1px; padding: 5px; overflow-y: auto;">
@@ -64,10 +45,12 @@ interface ApiResponseBase<T> {
 	</div>
 
 	<div style="flex: 1; display: flex; flex-direction: row; background: rgba(0,0,0,.9); padding: 10px; color: white; overflow-y: auto;">
-		{#if $query.isLoading}
+		{#if query.isLoading}
 			<div>Loading...</div>
-		{:else if $query.data}
-			{#each $query.data as set (set.id)}
+		{:else if !query.data.ok}
+			<div>Error... {query.data.error.message}</div>
+		{:else if query.data}
+			{#each query.data.value as set (set.id)}
 				<div style="width: 200px; height: 100px; margin: 4px;">
 					<button
 						class="btn btn-dark"

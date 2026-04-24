@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { createQuery } from '@tanstack/svelte-query';
-	import { router } from '../Router.svelte';
-	import { appState } from '../State.svelte';
-	import { PeerOperationMode, SongPlayStatus } from '../Types/Types';
+	import { router } from '../../Router.svelte';
+	import { appState } from '../../State.svelte';
+	import { PeerOperationMode, SongPlayStatus } from '../../Types/Types';
 	import { Log, LogVerbose } from '@shared/services/Logger';
-	import SongView from './SongView.svelte';
-	import { getSongStore } from '../Support/Stores/SongStore';
+	import SongView from '../SongView.svelte';
+	import { getSongStore } from '../../Support/Stores/SongStore';
 
 // Placeholder types - TODO: import from shared
 interface SetComplete {

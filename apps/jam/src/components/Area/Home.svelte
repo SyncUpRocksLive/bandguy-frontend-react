@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { router } from '../Router.svelte';
-	import { appState } from '../State.svelte';
-	import { PeerOperationMode } from '../Types/Types';
+	import { router } from '../../Router.svelte';
+	import { appState } from '../../State.svelte';
+	import { PeerOperationMode } from '../../Types/Types';
 	import { Log, LogError } from '@shared/services/Logger';
-	import { getSongStore } from '../Support/Stores/SongStore'; // TODO: create this
+	import { getSongStore } from '../../Support/Stores/SongStore'; // TODO: create this
 
 	onMount(async () => {
 		Log('verbose', 'Starting up IndexDb Services...');

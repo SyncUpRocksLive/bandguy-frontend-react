@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { auth } from "@/auth.svelte";
+	import { auth } from "@/Auth.svelte";
 	import { msToHMS } from "@shared/display/DisplayHelpers";
 	import { deleteSong, getSongsOverview } from "@shared/services/syncuprocks/musician/Api";
 	import type { SongOverview } from "@shared/services/syncuprocks/musician/Types";

@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { appState } from '../State.svelte';
-	import { PeerOperationMode } from '../Types/Types';
-	import BandJoin from './BandJoin.svelte';
+	import { appState } from '../../State.svelte';
+	import { PeerOperationMode } from '../../Types/Types';
+	import BandJoin from '../BandJoin.svelte';
 	import SetView from './SetView.svelte';
 
 	// Set peer mode to Guest when this component mounts

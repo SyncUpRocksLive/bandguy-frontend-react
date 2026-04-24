@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { auth } from "@/auth.svelte";
+	import { auth } from "@/Auth.svelte";
 	import { deleteSet, getSetsOverview, saveSet, saveSetsOverview } from "@shared/services/syncuprocks/musician/Api";
 	import type { SetOverview } from "@shared/services/syncuprocks/musician/Types";
 	import BasicTableEdit, { type ColumnDefinition, type TableConfig } from "@/lib/components/BasicTableEdit.svelte";

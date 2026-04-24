@@ -1,4 +1,3 @@
-// src/state.svelte.ts
 const STORAGE_KEY = 'mixingroom_settings';
 
 // Define an interface for your state structure

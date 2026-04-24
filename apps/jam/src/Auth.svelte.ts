@@ -35,7 +35,6 @@ const GetAuthState = async (slide: boolean = false): Promise<LoggedInStatus | nu
 	return response.data;
 };
 
-// src/auth.svelte.ts
 class AuthService {
 	// Use $state so the UI can react to login changes
 	isAuthenticated = $state<boolean | null>(null); // null = "checking", true, or false

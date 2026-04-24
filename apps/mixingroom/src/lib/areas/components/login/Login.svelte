@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { auth } from "@/auth.svelte";
+	import { auth } from "@/Auth.svelte";
 
 	const returnUrl = window.location.pathname + window.location.search + window.location.hash;
 
