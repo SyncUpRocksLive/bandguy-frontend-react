@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { router } from "@/Router.svelte";
-	import { appState } from "@/State.svelte";
 	
 </script>
 
