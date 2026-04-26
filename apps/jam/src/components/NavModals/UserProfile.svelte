@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { auth } from '../Auth.svelte';
+	import { auth } from '../../Auth.svelte';
 	import { onMount } from 'svelte';
 
 	let show = $state(false);
@@ -43,7 +43,7 @@
 	<button
 		class="profile-button"
 		onclick={() => setShow(!show)}
-		title={auth.user.displayName}
+		title={auth.user.userProfileName}
 		aria-label="User profile menu"
 	>
 		👤

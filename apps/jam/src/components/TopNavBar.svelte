@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { auth } from '../Auth.svelte';
-	import { appState } from '../State.svelte';
 	import { router } from '../Router.svelte';
+	import { syncStore } from '@/Stores/SyncStore.svelte';
 	import { PeerOperationMode } from '../Types/Types';
-	import Configuration from './Configuration.svelte';
-	import HostModeStatus from './HostModeStatus.svelte';
-	import GuestModeStatus from './GuestModeStatus.svelte';
-	import UserProfile from './UserProfile.svelte';
+	import Configuration from './NavModals/Configuration.svelte';
+	import HostModeStatus from './NavModals/HostModeStatus.svelte';
+	import GuestModeStatus from './NavModals/GuestModeStatus.svelte';
+	import UserProfile from './NavModals/UserProfile.svelte';
 </script>
 
 {#if auth.user}
@@ -17,12 +17,15 @@
 			<a href="/mixingroom">MIXING ROOM</a>
 
 			<div style="user-select: none;">
-				- {appState.store.peerMode}
+				- {$syncStore.peerMode}
 			</div>
 
 			<div style="flex: auto; display: flex; flex-direction: row; column-gap: 0; justify-content: right; align-items: right;">
-				<HostModeStatus />
-				<GuestModeStatus />
+				{#if $syncStore.peerMode === PeerOperationMode.Host}
+					<HostModeStatus />
+				{:else if $syncStore.peerMode === PeerOperationMode.Guest}
+					<GuestModeStatus />
+				{/if}
 				<Configuration />
 				<UserProfile />
 			</div>

@@ -1,5 +1,4 @@
 import { Client } from "@/Types/Client";
-import { JamChannelDetail } from "@shared/services/syncuprocks/musician/JamChannels";
 
 export interface UserState {
 	displayName: string;
@@ -24,22 +23,3 @@ export enum SongPlayStatus {
 	Pause = 'Pause',
 	Stop = 'Stop'
 }
-
-export interface StoreItems {
-	user?: UserState;
-	peerMode: PeerOperationMode;
-	connectedUsers: ConnectedUser[];
-	availableRemoteChannels?: JamChannelDetail[];
-	connectedChannelDetail?: JamChannelDetail;
-	currentSetId?: number;
-	currentSongId?: number;
-	songPlayStatus: SongPlayStatus;
-}
-
-export enum ActionType {
-	UPDATE = 'UPDATE',
-}
-
-export type StoreActions =
-	|{ type: ActionType.UPDATE, update: Partial<StoreItems> }
-;

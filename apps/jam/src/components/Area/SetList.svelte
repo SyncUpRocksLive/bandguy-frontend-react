@@ -1,38 +1,28 @@
 <script lang="ts">
 	import { createQuery } from '@tanstack/svelte-query';
-	import { router } from '../../Router.svelte';
-	import { appState } from '../../State.svelte';
-	import { PeerOperationMode } from '../../Types/Types';
+	import { router } from '@/Router.svelte';
+	import { auth } from '@/Auth.svelte';
+	import { syncStore } from "@/Stores/SyncStore.svelte"
 	import { Log } from '@shared/services/Logger';
 	import { getSetsOverview } from '@shared/services/syncuprocks/musician/Api';
 	import type { SetOverview } from '@shared/services/syncuprocks/musician/Types';
-
-	interface Props {
-		mode: 'host' | 'solo';
-	}
-
-	let { mode }: Props = $props();
-
-	$effect(() => {
-		const peerMode = mode === 'host' ? PeerOperationMode.Host : PeerOperationMode.Solo;
-		appState.setPeerMode(peerMode);
-	});
+	import { PeerOperationMode } from '@/Types/Types';
 
 	let query = createQuery(() => ({
-		queryKey: ['my.setlist', appState.store.user?.userId ?? 'none'],
+		queryKey: ['my.setlist', auth.user?.userId ?? 'none'],
 		queryFn: async () => {
-			console.log("Fetching for user:", appState.store.user?.userId);
-			return await getSetsOverview(appState.store.user!.userId);
+			console.log("Fetching for user:", auth.user?.userId);
+			return await getSetsOverview(auth.user!.userId);
 		},
 		refetchInterval: 600000,
 		staleTime: 0,
 		refetchOnMount: 'always',
 		refetchOnWindowFocus: true,
-		enabled: true, //!!appState.store.user?.userId,
+		enabled: !!auth.user?.userId,
 	}));
 
 	function playSet(set: SetOverview) {
-		const route = mode === 'host' ? 'HostSetView' : 'SoloSetView';
+		const route = $syncStore.peerMode === PeerOperationMode.Host ? 'HostSetView' : 'SoloSetView';
 		Log('verbose', `Starting set=${set.name} route=${route}`);
 		router.navigate(route, [set.id.toString()]);
 	}
@@ -48,7 +38,7 @@
 		{#if query.isLoading}
 			<div>Loading...</div>
 		{:else if !query.data.ok}
-			<div>Error... {query.data.error.message}</div>
+			<div>Error... {query.data?.error.message ?? ""}</div>
 		{:else if query.data}
 			{#each query.data.value as set (set.id)}
 				<div style="width: 200px; height: 100px; margin: 4px;">

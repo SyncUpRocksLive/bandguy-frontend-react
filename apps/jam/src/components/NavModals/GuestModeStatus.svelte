@@ -1,17 +1,15 @@
 <script lang="ts">
-	import { appState } from '../State.svelte';
-	import { PeerOperationMode } from '../Types/Types';
-
 	let show = $state(false);
 
 	function leaveChannel() {
 		setShow(false);
+
 		// TODO: Implement leave channel logic
-		appState.updateStore({
-			connectedChannelDetail: undefined,
-			connectedUsers: [],
-			currentSetId: undefined
-		});
+		// appState.updateStore({
+		// 	connectedChannelDetail: undefined,
+		// 	connectedUsers: [],
+		// 	currentSetId: undefined
+		// });
 	}
 
 	function setShow(value: boolean) {
@@ -19,52 +17,50 @@
 	}
 </script>
 
-{#if appState.store.peerMode === PeerOperationMode.Guest}
-	<button
-		class="status-button"
-		onclick={() => setShow(!show)}
-		title="Guest Status"
-		aria-label="Guest status menu"
-	>
-		🎤
-	</button>
+<button
+	class="status-button"
+	onclick={() => setShow(!show)}
+	title="Guest Status"
+	aria-label="Guest status menu"
+>
+	🎤
+</button>
 
-	{#if show}
-		<div class="status-overlay" onclick={() => setShow(false)} onkeydown={(e) => { if (e.key === 'Escape') setShow(false); }} role="dialog" aria-modal="true" tabindex="-1">
-			<div class="status-popover" onclick={(e) => e.stopPropagation()}>
-				<div class="status-header">
-					<h4>Band Member {appState.store.user?.displayName}</h4>
-					<button onclick={() => setShow(false)} aria-label="Close">&times;</button>
-				</div>
-				<div class="status-body">
-					{#if appState.store.connectedUsers.length > 0}
-						<div class="band-section">
-							<strong>Band:</strong>
-							<ul class="band-list">
-								{#each appState.store.connectedUsers as user (user.userId)}
-									<li class="band-item">
-										{user.username} ({user.role})
-										{#if user.isBandLeader}
-											<span class="leader-badge">Leader</span>
-										{/if}
-									</li>
-								{/each}
-							</ul>
-							<button
-								class="leave-button"
-								onclick={leaveChannel}
-								aria-label="Leave band"
-							>
-								Leave Band
-							</button>
-						</div>
-					{:else}
-						<p>Not Connected</p>
-					{/if}
-				</div>
+{#if show}
+	<div class="status-overlay" onclick={() => setShow(false)} onkeydown={(e) => { if (e.key === 'Escape') setShow(false); }} role="dialog" aria-modal="true" tabindex="-1">
+		<div class="status-popover" onclick={(e) => e.stopPropagation()}>
+			<div class="status-header">
+				<h4>Band Member {appState.store.user?.displayName}</h4>
+				<button onclick={() => setShow(false)} aria-label="Close">&times;</button>
+			</div>
+			<div class="status-body">
+				{#if appState.store.connectedUsers.length > 0}
+					<div class="band-section">
+						<strong>Band:</strong>
+						<ul class="band-list">
+							{#each appState.store.connectedUsers as user (user.userId)}
+								<li class="band-item">
+									{user.username} ({user.role})
+									{#if user.isBandLeader}
+										<span class="leader-badge">Leader</span>
+									{/if}
+								</li>
+							{/each}
+						</ul>
+						<button
+							class="leave-button"
+							onclick={leaveChannel}
+							aria-label="Leave band"
+						>
+							Leave Band
+						</button>
+					</div>
+				{:else}
+					<p>Not Connected</p>
+				{/if}
 			</div>
 		</div>
-	{/if}
+	</div>
 {/if}
 
 <style>

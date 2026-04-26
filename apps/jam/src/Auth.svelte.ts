@@ -1,39 +1,5 @@
-import { appState } from './State.svelte';
-
-// Real auth implementation copied from shared
-interface LoggedInStatus {
-    isLoggedIn: boolean;
-    userId: string;
-    userProfileName: string;
-    username: string;
-    logInUrl?: string;
-    logOutUrl?: string;
-}
-
-interface ApiResponseBase<T> {
-	success: boolean;
-	data?: T;
-	errorMessage?: string;
-}
-
-const Log = console.log; // Placeholder logger
-
-const GetAuthState = async (slide: boolean = false): Promise<LoggedInStatus | null> => {
-	Log('verbose', 'Checking login state...');
-	const data = await fetch(`/api/auth/loggedin`, { method: "GET", headers: { "Content-Type": "application/json" }});
-	const response: ApiResponseBase<LoggedInStatus> = await data.json();
-	Log('verbose', `Checking login state... ${data.status}`);
-	if (data.status === 401 || !response.data || response.data.isLoggedIn === false || !response.data.userId || !response.data.username) {
-		Log('verbose', 'Checking login state... Unauthorized');
-		return null;
-	}
-	else if (!response.success) {
-		Log('error', `Checking login state... unknown failure ${response.errorMessage}`);
-		return null;
-	}
-
-	return response.data;
-};
+import { GetAuthState } from '@shared/services/syncuprocks/auth/Api';
+import type { LoggedInStatus } from '@shared/services/syncuprocks/auth/Types';
 
 class AuthService {
 	// Use $state so the UI can react to login changes
@@ -63,19 +29,7 @@ class AuthService {
 
 			// Update state
 			this.isAuthenticated = loginState ? loginState.isLoggedIn : false;
-			this.user = loginState ? {
-				displayName: loginState.userProfileName,
-				username: loginState.username,
-				userId: loginState.userId
-			} : null;
-
-			appState.updateStore({
-				user: this.user ? {
-					displayName: this.user.displayName,
-					username: this.user.username,
-					userId: this.user.userId
-				} : undefined
-			});
+			this.user = loginState;
 
 			if (loginState) {
 				this.loginUrl = loginState.logInUrl || null;

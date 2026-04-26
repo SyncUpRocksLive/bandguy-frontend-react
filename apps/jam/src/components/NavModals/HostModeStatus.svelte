@@ -1,9 +1,8 @@
 <script lang="ts">
-	import { appState } from '../State.svelte';
-	import { PeerOperationMode } from '../Types/Types';
+	import { appState } from '../../State.svelte';
 	import { LogInfo } from '@shared/services/Logger';
-	import { broadcastMessage } from '../Support/MessageBus';
-	import { MessageBusActionType } from '../Types/MessageBus';
+	import { broadcastMessage } from '../../Support/MessageBus';
+	import { MessageBusActionType } from '../../Types/MessageBus';
 
 	let show = $state(false);
 
@@ -24,49 +23,47 @@
 	}
 </script>
 
-{#if appState.store.peerMode === PeerOperationMode.Host}
-	<button
-		class="status-button"
-		onclick={() => setShow(!show)}
-		title="Host Status"
-		aria-label="Host status menu"
-	>
-		🎸
-	</button>
+<button
+	class="status-button"
+	onclick={() => setShow(!show)}
+	title="Host Status"
+	aria-label="Host status menu"
+>
+	🎸
+</button>
 
-	{#if show}
-		<div class="status-overlay" onclick={() => setShow(false)} onkeydown={(e) => { if (e.key === 'Escape') setShow(false); }} role="dialog" aria-modal="true" tabindex="-1">
-			<div class="status-popover" onclick={(e) => e.stopPropagation()}>
-				<div class="status-header">
-					<h4>Band Leader {appState.store.user?.displayName}</h4>
-					<button onclick={() => setShow(false)} aria-label="Close">&times;</button>
-				</div>
-				<div class="status-body">
-					<div class="bandmates-section">
-						<strong>Bandmates:</strong>
-						{#if appState.store.connectedUsers.length > 0}
-							<ul class="bandmates-list">
-								{#each appState.store.connectedUsers as user (user.userId)}
-									<li class="bandmate-item">
-										{user.username} ({user.role})
-										<button
-											class="kick-button"
-											onclick={() => bootFromBand(user)}
-											aria-label="Kick {user.username} out of band"
-										>
-											Kick out
-										</button>
-									</li>
-								{/each}
-							</ul>
-						{:else}
-							<p>No bandmates connected</p>
-						{/if}
-					</div>
+{#if show}
+	<div class="status-overlay" onclick={() => setShow(false)} onkeydown={(e) => { if (e.key === 'Escape') setShow(false); }} role="dialog" aria-modal="true" tabindex="-1">
+		<div class="status-popover" onclick={(e) => e.stopPropagation()}>
+			<div class="status-header">
+				<h4>Band Leader {appState.store.user?.displayName}</h4>
+				<button onclick={() => setShow(false)} aria-label="Close">&times;</button>
+			</div>
+			<div class="status-body">
+				<div class="bandmates-section">
+					<strong>Bandmates:</strong>
+					{#if appState.store.connectedUsers.length > 0}
+						<ul class="bandmates-list">
+							{#each appState.store.connectedUsers as user (user.userId)}
+								<li class="bandmate-item">
+									{user.username} ({user.role})
+									<button
+										class="kick-button"
+										onclick={() => bootFromBand(user)}
+										aria-label="Kick {user.username} out of band"
+									>
+										Kick out
+									</button>
+								</li>
+							{/each}
+						</ul>
+					{:else}
+						<p>No bandmates connected</p>
+					{/if}
 				</div>
 			</div>
 		</div>
-	{/if}
+	</div>
 {/if}
 
 <style>

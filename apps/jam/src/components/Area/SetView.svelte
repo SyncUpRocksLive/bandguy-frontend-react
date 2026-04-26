@@ -6,21 +6,7 @@
 	import { Log, LogVerbose } from '@shared/services/Logger';
 	import SongView from '../SongView.svelte';
 	import { getSongStore } from '../../Support/Stores/SongStore';
-
-// Placeholder types - TODO: import from shared
-interface SetComplete {
-	musicianId: number;
-	id: number;
-	name: string;
-	createdAtMsUtc: number;
-	songs: any[]; // Song[]
-}
-
-interface ApiResponseBase<T> {
-	success: boolean;
-	data?: T;
-	errorMessage?: string;
-}
+	import { getSetComplete } from '@shared/services/syncuprocks/musician/Api';
 
 	interface Props {
 		mode: 'host' | 'solo';
@@ -36,29 +22,24 @@ interface ApiResponseBase<T> {
 		appState.setCurrentSet(parseInt(setId, 10));
 	});
 
-	const query = createQuery({
+	const query = createQuery(() => ({
 		queryKey: ['setlist', appState.store.currentSetId],
 		queryFn: async () => {
 			if (!appState.store.currentSetId) return null;
 			LogVerbose(`Downloading set overview for setId=${appState.store.currentSetId}`);
-			const data = await fetch(`/api/legacy/user/sets/complete/${appState.store.currentSetId}`, {
-				method: "GET",
-				headers: { "Content-Type": "application/json" }
-			});
-			const response: ApiResponseBase<SetComplete> = await data.json();
-			return response.data;
+			return await getSetComplete(appState.store.currentSetId, false);
 		},
 		refetchInterval: false,
 		staleTime: 0,
 		refetchOnMount: 'always',
 		refetchOnWindowFocus: false,
 		enabled: !!appState.store.currentSetId,
-	});
+	}));
 
 	// Auto-select first song when set loads
 	$effect(() => {
-		if ($query.data && $query.data.songs.length > 0 && !appState.store.currentSongId) {
-			appState.updateStore({ currentSongId: $query.data.songs[0].id });
+		if (query.data?.value && query.data.value.songs.length > 0 && !appState.store.currentSongId) {
+			appState.updateStore({ currentSongId: query.data.value.songs[0].id });
 		}
 	});
 
@@ -86,9 +67,11 @@ interface ApiResponseBase<T> {
 </script>
 
 <div class="set-view">
-	{#if $query.isLoading}
+	{#if query.isLoading}
 		<div>Loading set...</div>
-	{:else if $query.data}
+	{:else if !query.data || !query.data.ok}
+		<div>Error... {query.data?.error?.message ?? 'unknown'}</div>
+	{:else if query.data}
 		<div class="set-container">
 			<!-- Sidebar with controls and song list -->
 			<div class="sidebar">
@@ -119,7 +102,7 @@ interface ApiResponseBase<T> {
 
 				<div class="song-list">
 					<ul>
-						{#each $query.data.songs as song (song.id)}
+						{#each query.data.value.songs as song (song.id)}
 							<li>
 								<button
 									class="song-btn"
@@ -139,7 +122,7 @@ interface ApiResponseBase<T> {
 			<div class="main-content">
 				{#if appState.store.currentSongId}
 					<SongView
-						song={$query.data.songs.find(s => s.id === appState.store.currentSongId)}
+						song={query.data.value.songs.find(s => s.id === appState.store.currentSongId)}
 						mode={mode}
 					/>
 				{:else}

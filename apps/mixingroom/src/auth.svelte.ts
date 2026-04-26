@@ -29,7 +29,7 @@ class AuthService {
 
 			// Update state
 			this.isAuthenticated = loginState ? loginState.isLoggedIn : false;
-			this.user = loginState || null;
+			this.user = loginState;
 
 			if (loginState) {
 				this.loginUrl = loginState.logInUrl || null;

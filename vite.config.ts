@@ -15,11 +15,6 @@ export default defineConfig({
       '.local'        // Or use a wildcard for any .local address
     ],
     proxy: {
-      '/old': {
-        target: 'http://localhost:5175',
-        changeOrigin: true,
-        ws: true // Crucial for WebRTC signals/WebSockets
-      },
       '/mixingroom': {
         target: 'http://localhost:5174',
         changeOrigin: true,
