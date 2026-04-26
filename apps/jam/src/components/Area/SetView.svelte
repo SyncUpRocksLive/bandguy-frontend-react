@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { createQuery } from '@tanstack/svelte-query';
-	import { router } from '../../Router.svelte';
-	import { appState } from '../../State.svelte';
+	import { router } from '@/Router.svelte';
+	import { syncStore } from '@/Stores/SyncStore.svelte';
+
 	import { PeerOperationMode, SongPlayStatus } from '../../Types/Types';
 	import { Log, LogVerbose } from '@shared/services/Logger';
 	import SongView from '../SongView.svelte';
@@ -9,53 +10,38 @@
 	import { getSetComplete } from '@shared/services/syncuprocks/musician/Api';
 
 	interface Props {
-		mode: 'host' | 'solo';
 		setId: string;
 	}
 
-	let { mode, setId }: Props = $props();
-
-	// Update state
-	$effect(() => {
-		const peerMode = mode === 'host' ? PeerOperationMode.Host : PeerOperationMode.Solo;
-		appState.setPeerMode(peerMode);
-		appState.setCurrentSet(parseInt(setId, 10));
-	});
+	let { setId }: Props = $props();
 
 	const query = createQuery(() => ({
-		queryKey: ['setlist', appState.store.currentSetId],
+		queryKey: ['setlist', $syncStore.currentSetId],
 		queryFn: async () => {
-			if (!appState.store.currentSetId) return null;
-			LogVerbose(`Downloading set overview for setId=${appState.store.currentSetId}`);
-			return await getSetComplete(appState.store.currentSetId, false);
+			if (!$syncStore.currentSetId) return null;
+			LogVerbose(`Downloading set overview for setId=${$syncStore.currentSetId}`);
+			return await getSetComplete($syncStore.currentSetId, false);
 		},
 		refetchInterval: false,
 		staleTime: 0,
 		refetchOnMount: 'always',
 		refetchOnWindowFocus: false,
-		enabled: !!appState.store.currentSetId,
+		enabled: !!$syncStore.currentSetId,
 	}));
 
-	// Auto-select first song when set loads
-	$effect(() => {
-		if (query.data?.value && query.data.value.songs.length > 0 && !appState.store.currentSongId) {
-			appState.updateStore({ currentSongId: query.data.value.songs[0].id });
-		}
-	});
-
 	function loadSong(song: any) {
-		appState.updateStore({
-			currentSongId: song.id,
-			songPlayStatus: SongPlayStatus.Play
-		});
+		// appState.updateStore({
+		// 	currentSongId: song.id,
+		// 	songPlayStatus: SongPlayStatus.Play
+		// });
 	}
 
 	function playSong() {
-		appState.updateStore({ songPlayStatus: SongPlayStatus.Play });
+		//appState.updateStore({ songPlayStatus: SongPlayStatus.Play });
 	}
 
 	function pauseSong() {
-		appState.updateStore({ songPlayStatus: SongPlayStatus.Pause });
+		//appState.updateStore({ songPlayStatus: SongPlayStatus.Pause });
 	}
 
 	function formatDuration(duration: number): string {
@@ -64,6 +50,11 @@
 		const secs = totalSeconds % 60;
 		return `${mins}:${secs.toString().padStart(2, '0')}`;
 	}
+
+	// Update state
+	$effect(() => {
+		syncStore.updateState({currentSetId: parseInt(setId)})
+	});
 </script>
 
 <div class="set-view">
@@ -78,7 +69,7 @@
 				<div class="controls">
 					<button
 						class="control-btn play-btn"
-						class:pulse={appState.store.songPlayStatus === SongPlayStatus.Play}
+						class:pulse={$syncStore.songPlayStatus === SongPlayStatus.Play}
 						onclick={playSong}
 						title="Start playing"
 					>
@@ -106,11 +97,11 @@
 							<li>
 								<button
 									class="song-btn"
-									class:active={appState.store.currentSongId === song.id}
+									class:active={$syncStore.currentSongId === song.id}
 									onclick={() => loadSong(song)}
-									title={`Play ${song.title || song.name || 'Untitled'}`}
+									title={`Play ${song.name || '?'}`}
 								>
-									▶ {song.title || song.name || 'Untitled'}
+									▶ {song.name || '?'}
 								</button>
 							</li>
 						{/each}
@@ -120,10 +111,9 @@
 
 			<!-- Main content area -->
 			<div class="main-content">
-				{#if appState.store.currentSongId}
+				{#if $syncStore.currentSongId}
 					<SongView
-						song={query.data.value.songs.find(s => s.id === appState.store.currentSongId)}
-						mode={mode}
+						song={query.data.value.songs.find(s => s.id === $syncStore.currentSongId)}
 					/>
 				{:else}
 					<div class="no-song">Select a song to begin</div>

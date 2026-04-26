@@ -6,10 +6,9 @@
 
 	interface Props {
 		song: Song;
-		mode: 'host' | 'solo';
 	}
 
-	let { song, mode }: Props = $props();
+	let { song }: Props = $props();
 
 	let isPlaying = $state(false);
 	let currentTime = $state(0);
