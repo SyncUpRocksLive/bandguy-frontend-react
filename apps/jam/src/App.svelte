@@ -34,11 +34,11 @@
 		{:else if router.route.area === 'HostSets'}
 			<SetList />
 		{:else if router.route.area === 'HostSetView'}
-			<SetView setId={router.route.params[0]} />
+			<SetView setId={parseInt(router.route.params[0])} />
 		{:else if router.route.area === 'SoloSets'}
 			<SetList />
 		{:else if router.route.area === 'SoloSetView'}
-			<SetView setId={router.route.params[0]} />
+			<SetView setId={parseInt(router.route.params[0])} />
 		{:else if router.route.area === 'Guest'}
 			<Guest />
 		{:else}

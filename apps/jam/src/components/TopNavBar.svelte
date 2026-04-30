@@ -7,18 +7,17 @@
 	import HostModeStatus from './NavModals/HostModeStatus.svelte';
 	import GuestModeStatus from './NavModals/GuestModeStatus.svelte';
 	import UserProfile from './NavModals/UserProfile.svelte';
+	import TopNavBadge from './TopNavBadge.svelte';
 </script>
 
 {#if auth.user}
 	<header>
 		<div style="padding: 3px 10px 0 10px; width: 100%; display: flex; flex-direction: row; color: white; background: rgba(155,155,155,.1); justify-content: center; align-items: center;">
-			<a href="/">HOME</a> -
-			<a href="#/" onclick={router.linkTo('Home').onclick}>JAM</a> -
-			<a href="/mixingroom">MIXING ROOM</a>
+			<a href="/">HOME</a> |
+			<a href="/mixingroom">MIXING ROOM</a> |
+			<a href="#/" onclick={router.linkTo('Home').onclick}>JAM</a> | 
 
-			<div style="user-select: none;">
-				- {$syncStore.peerMode}
-			</div>
+			<TopNavBadge />
 
 			<div style="flex: auto; display: flex; flex-direction: row; column-gap: 0; justify-content: right; align-items: right;">
 				{#if $syncStore.peerMode === PeerOperationMode.Host}

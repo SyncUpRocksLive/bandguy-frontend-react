@@ -1,16 +1,14 @@
 <script lang="ts">
+	import { onDestroy } from 'svelte';
 	import { createQuery } from '@tanstack/svelte-query';
-	import { router } from '@/Router.svelte';
 	import { syncStore } from '@/Stores/SyncStore.svelte';
-
-	import { PeerOperationMode, SongPlayStatus } from '../../Types/Types';
-	import { Log, LogVerbose } from '@shared/services/Logger';
-	import SongView from '../SongView.svelte';
-	import { getSongStore } from '../../Support/Stores/SongStore';
+	import { SongPlayStatus } from '@/Types/Types';
+	import { LogVerbose } from '@shared/services/Logger';
+	import SongView from '@/Components/SongView.svelte';
 	import { getSetComplete } from '@shared/services/syncuprocks/musician/Api';
 
 	interface Props {
-		setId: string;
+		setId: number;
 	}
 
 	let { setId }: Props = $props();
@@ -30,6 +28,8 @@
 	}));
 
 	function loadSong(song: any) {
+		console.log(`setting song=${song}`);
+		syncStore.updateState({ currentSongId: song.id, currentSong: song });
 		// appState.updateStore({
 		// 	currentSongId: song.id,
 		// 	songPlayStatus: SongPlayStatus.Play
@@ -37,11 +37,11 @@
 	}
 
 	function playSong() {
-		//appState.updateStore({ songPlayStatus: SongPlayStatus.Play });
+		syncStore.updateState({ songPlayStatus: SongPlayStatus.Play });
 	}
 
 	function pauseSong() {
-		//appState.updateStore({ songPlayStatus: SongPlayStatus.Pause });
+		syncStore.updateState({ songPlayStatus: SongPlayStatus.Pause });
 	}
 
 	function formatDuration(duration: number): string {
@@ -53,15 +53,41 @@
 
 	// Update state
 	$effect(() => {
-		syncStore.updateState({currentSetId: parseInt(setId)})
+		syncStore.updateState({currentSetId: setId})
 	});
+
+	onDestroy(() => {
+    	// This runs when the component unmounts
+    	console.log("Cleaning up downstream state...");
+		syncStore.updateState({
+			currentSetId: undefined,
+			currentSongId: undefined,
+			currentSong: undefined,
+			songPlayStatus: SongPlayStatus.Stop
+		})
+  	});
+
+	const errorMessage = $derived.by(() => {
+		if (!query.isLoading) {
+			if (query.isError) {
+				return query.error.message;
+			} else if (!query.data) {
+				return "No Data Loaded";
+			} else if (query.data.ok === false) {
+				return query.data.error ?? "Unknown Error";
+			}
+		}
+	
+		return undefined;
+	});
+
 </script>
 
 <div class="set-view">
 	{#if query.isLoading}
 		<div>Loading set...</div>
-	{:else if !query.data || !query.data.ok}
-		<div>Error... {query.data?.error?.message ?? 'unknown'}</div>
+	{:else if errorMessage}
+		<div>Error: {errorMessage}</div>
 	{:else if query.data}
 		<div class="set-container">
 			<!-- Sidebar with controls and song list -->
@@ -113,20 +139,16 @@
 			<div class="main-content">
 				{#if $syncStore.currentSongId}
 					<SongView
-						song={query.data.value.songs.find(s => s.id === $syncStore.currentSongId)}
+						song={$syncStore.currentSong}
 					/>
 				{:else}
-					<div class="no-song">Select a song to begin</div>
+					<div class="no-song">Select a song to begin - g</div>
 				{/if}
 			</div>
 		</div>
 	{:else}
 		<div>No set data</div>
 	{/if}
-
-	<button class="back-btn" onclick={() => router.navigate(mode === 'host' ? 'HostSets' : 'SoloSets')}>
-		Back to Sets
-	</button>
 </div>
 
 <style>
@@ -229,14 +251,17 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		border-radius: 0;
+		opacity: .4;
 	}
 
 	.song-btn:hover {
 		background-color: #495057;
+		opacity: 1;
 	}
 
 	.song-btn.active {
 		background-color: rgba(100, 100, 200, 0.8);
+		opacity: .8;
 	}
 
 	.main-content {

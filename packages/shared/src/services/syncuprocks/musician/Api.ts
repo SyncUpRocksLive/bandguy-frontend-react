@@ -46,7 +46,7 @@ const checkErrorResponse = (response: ApiResponseBase<any>, context: string, che
  * @param setId Set Identifier
  * @returns 
  */
-export const getSetComplete = async (setId: number, useCache: boolean = true) : Promise<Result<SetComplete | null>> => {
+export const getSetComplete = async (setId: number, useCache: boolean = true) : Promise<Result<SetComplete>> => {
 	let url = `/api/legacy/user/sets/complete/${setId}`;
 	if (!useCache) {
 		url += '?useCache=false';

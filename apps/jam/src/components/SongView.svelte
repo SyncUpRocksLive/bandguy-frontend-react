@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { onMount, createEventDispatcher } from 'svelte';
-	import { appState } from '../State.svelte';
+	import { syncStore } from "@/Stores/SyncStore.svelte"
 	import { SongPlayStatus } from '../Types/Types';
-	import type { Song } from '../Types/Client';
+	import type { Song } from '@shared/services/syncuprocks/musician/Types';
 
 	interface Props {
 		song: Song;
@@ -40,15 +40,15 @@
 
 	function handleEnded() {
 		isPlaying = false;
-		appState.updateStore({ songPlayStatus: SongPlayStatus.Stop });
-		dispatch('ended');
+		//appState.updateStore({ songPlayStatus: SongPlayStatus.Stop });
+		//dispatch('ended');
 	}
 
 	function play() {
 		if (videoElement) {
 			videoElement.play();
 			isPlaying = true;
-			appState.updateStore({ songPlayStatus: SongPlayStatus.Play });
+			//appState.updateStore({ songPlayStatus: SongPlayStatus.Play });
 		}
 	}
 
@@ -56,7 +56,7 @@
 		if (videoElement) {
 			videoElement.pause();
 			isPlaying = false;
-			appState.updateStore({ songPlayStatus: SongPlayStatus.Pause });
+			//appState.updateStore({ songPlayStatus: SongPlayStatus.Pause });
 		}
 	}
 
@@ -66,7 +66,7 @@
 			videoElement.currentTime = 0;
 			isPlaying = false;
 			currentTime = 0;
-			appState.updateStore({ songPlayStatus: SongPlayStatus.Stop });
+			//appState.updateStore({ songPlayStatus: SongPlayStatus.Stop });
 		}
 	}
 
@@ -85,42 +85,19 @@
 	}
 
 	// Reactive statement to sync with global state
-	$effect(() => {
-		if (appState.store.songPlayStatus === SongPlayStatus.Play && !isPlaying) {
-			play();
-		} else if (appState.store.songPlayStatus === SongPlayStatus.Pause && isPlaying) {
-			pause();
-		} else if (appState.store.songPlayStatus === SongPlayStatus.Stop) {
-			stop();
-		}
-	});
+	// $effect(() => {
+	// 	if (appState.store.songPlayStatus === SongPlayStatus.Play && !isPlaying) {
+	// 		play();
+	// 	} else if (appState.store.songPlayStatus === SongPlayStatus.Pause && isPlaying) {
+	// 		pause();
+	// 	} else if (appState.store.songPlayStatus === SongPlayStatus.Stop) {
+	// 		stop();
+	// 	}
+	// });
 </script>
 
 <div class="song-view">
-	<div class="song-header">
-		<h2>{song?.title || song?.name || 'Untitled Song'}</h2>
-		{#if song?.artist}
-			<p class="artist">{song.artist}</p>
-		{/if}
-	</div>
-
 	<div class="player-controls">
-		<div class="time-display">
-			{formatTime(currentTime)} / {formatTime(duration)}
-		</div>
-
-		<div class="controls">
-			<button class="control-btn" onclick={play} disabled={isPlaying}>
-				▶ Play
-			</button>
-			<button class="control-btn" onclick={pause} disabled={!isPlaying}>
-				⏸ Pause
-			</button>
-			<button class="control-btn" onclick={stop}>
-				⏹ Stop
-			</button>
-		</div>
-
 		<input
 			type="range"
 			min="0"
@@ -132,36 +109,12 @@
 	</div>
 
 	<div class="video-container">
-		{#if song?.videoUrl}
-			<video
-				bind:this={videoElement}
-				width="100%"
-				height="400"
-				controls={false}
-				preload="metadata"
-			>
-				<source src={song.videoUrl} type="video/mp4" />
-				Your browser does not support the video tag.
-			</video>
-		{:else}
-			<div class="no-video">
-				<p>No video available for this song</p>
-				<p>Audio playback would go here</p>
-			</div>
-		{/if}
+
 	</div>
 
 	<div class="lyrics-container">
 		<!-- Basic lyrics display - could be enhanced with BasicLyricViewer logic -->
-		{#if song?.lyrics}
-			<div class="lyrics">
-				<pre>{song.lyrics}</pre>
-			</div>
-		{:else}
-			<div class="no-lyrics">
-				<p>No lyrics available</p>
-			</div>
-		{/if}
+
 	</div>
 </div>
 

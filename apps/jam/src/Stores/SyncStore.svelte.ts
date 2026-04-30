@@ -1,4 +1,5 @@
 import { PeerOperationMode, SongPlayStatus } from "@/Types/Types";
+import { Song } from "@shared/services/syncuprocks/musician/Types";
 import { JamChannelDetail } from "@shared/services/syncuprocks/musician/JamChannels";
 import { writable } from "svelte/store";
 
@@ -8,6 +9,8 @@ export interface SyncStoreItems {
 	connectedChannelDetail?: JamChannelDetail;
 	currentSetId?: number;
 	currentSongId?: number;
+	currentSong?: Song,
+	currentSongPlabackTimeSeconds?: number;
 	songPlayStatus: SongPlayStatus;
 }
 
@@ -19,6 +22,7 @@ function createSyncStore () {
 		connectedChannelDetail: undefined,
 		currentSetId: undefined,
 		currentSongId: undefined,
+		currentSong: undefined,
 		songPlayStatus: SongPlayStatus.Stop
 	});
 
