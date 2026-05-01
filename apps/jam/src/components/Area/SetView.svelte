@@ -6,6 +6,7 @@
 	import { LogVerbose } from '@shared/services/Logger';
 	import SongView from '@/Components/SongView.svelte';
 	import { getSetComplete } from '@shared/services/syncuprocks/musician/Api';
+	import type { Song } from '@shared/services/syncuprocks/musician/Types';
 
 	interface Props {
 		setId: number;
@@ -27,13 +28,11 @@
 		enabled: !!$syncStore.currentSetId,
 	}));
 
-	function loadSong(song: any) {
-		console.log(`setting song=${song}`);
+	function loadSong(song: Song) {
+		console.log(`setting song=${song.name}`);
 		syncStore.updateState({ currentSongId: song.id, currentSong: song });
-		// appState.updateStore({
-		// 	currentSongId: song.id,
-		// 	songPlayStatus: SongPlayStatus.Play
-		// });
+		// TODO: Only load tracks we want to see
+		syncStore.ensureCurrentSongLoaded();
 	}
 
 	function playSong() {
@@ -64,7 +63,9 @@
 			currentSongId: undefined,
 			currentSong: undefined,
 			songPlayStatus: SongPlayStatus.Stop
-		})
+		});
+
+		//syncStore.setSong(undefined, undefined, undefined);
   	});
 
 	const errorMessage = $derived.by(() => {

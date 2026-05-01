@@ -1,4 +1,3 @@
-
 const Log = console.log;
 const LogError = console.error;
 const LogInfo = console.info;
