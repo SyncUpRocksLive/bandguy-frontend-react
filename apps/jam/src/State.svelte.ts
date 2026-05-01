@@ -1,4 +1,5 @@
 import type { MessageBusEvent } from '@/Types/MessageBus';
+import { CreateSongStore } from './Support/Stores/SongStore';
 
 	// {#if appState.store.peerMode === PeerOperationMode.Host}
 	// 	<BandLeaderService />
@@ -20,13 +21,16 @@ class AppState {
 		lastError: null as string | null,
 	});
 
+	songStore = CreateSongStore();
+
 	constructor() {
-		// Initialize from localStorage or defaults
-		this.loadFromStorage();
 	}
 
-	loadFromStorage() {
+	async loadFromStorage() {
 		// TODO: load user, peerMode, etc. from localStorage if needed
+		await this.songStore.initialize();
+		await this.songStore.vacuum();
+		
 	}
 
 	saveToStorage() {

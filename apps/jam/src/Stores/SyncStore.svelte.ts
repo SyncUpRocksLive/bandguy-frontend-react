@@ -10,9 +10,10 @@ export interface SyncStoreItems {
 	currentSetId?: number;
 	currentSongId?: number;
 	currentSong?: Song,
-	currentSongPlabackTimeSeconds?: number;
+	plabackTimeMilliseconds: number;
 	songPlayStatus: SongPlayStatus;
 }
+
 
 // This store handles current song status, modes, tracks, setlists, etc
 function createSyncStore () {
@@ -23,6 +24,7 @@ function createSyncStore () {
 		currentSetId: undefined,
 		currentSongId: undefined,
 		currentSong: undefined,
+		plabackTimeMilliseconds: 0,
 		songPlayStatus: SongPlayStatus.Stop
 	});
 

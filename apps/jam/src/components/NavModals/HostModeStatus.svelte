@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { appState } from '../../State.svelte';
 	import { LogInfo } from '@shared/services/Logger';
-	import { broadcastMessage } from '../../Support/MessageBus';
+	import { broadcastMessage } from '../../Support/Services/MessageBus';
 	import { MessageBusActionType } from '../../Types/MessageBus';
 
 	let show = $state(false);

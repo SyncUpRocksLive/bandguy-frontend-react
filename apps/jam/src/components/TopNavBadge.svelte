@@ -4,6 +4,7 @@
 </script>
 
 <div>
-	{$syncStore.currentSongPlabackTimeSeconds ? msToHMS($syncStore.currentSongPlabackTimeSeconds * 1000) : '--:--' } / 
-	{$syncStore.currentSong ? msToHMS($syncStore.currentSong.durationMilliseconds) : '--:--' } - {$syncStore.currentSong?.name ?? '--'}
+	[ {msToHMS($syncStore.plabackTimeMilliseconds) } :
+	{$syncStore.currentSong ? msToHMS($syncStore.currentSong.durationMilliseconds) : '--:--' } ] {$syncStore.currentSong?.name ?? '--'}
 </div>
+

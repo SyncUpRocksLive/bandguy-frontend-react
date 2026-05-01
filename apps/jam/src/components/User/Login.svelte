@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { auth } from "../Auth.svelte";
+	import { auth } from "../../Auth.svelte";
 </script>
 
 <div class="Auth-form-container d-flex align-items-center justify-content-center"

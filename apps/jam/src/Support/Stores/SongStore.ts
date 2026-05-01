@@ -1,8 +1,3 @@
-// Placeholder - TODO: import from shared
-enum TrackFormat {
-	Lyric = 'Lyric',
-	Text = 'Text',
-}
 
 const Log = console.log;
 const LogError = console.error;
@@ -11,7 +6,8 @@ const LogInfo = console.info;
 export interface SongBlob {
 	songId: number;
 	trackId: number;
-	format: TrackFormat;
+	version: number;
+	format: string;
 	timestamp: number;
 	data: Blob;
 }
@@ -19,9 +15,10 @@ export interface SongBlob {
 export interface ISongStore {
 	// Does not need to be called explicitly.
 	initialize:() => Promise<undefined>;
-	exists:(songId: number, trackId: number) => Promise<boolean>;
-	get:(songId: number, trackId: number) => Promise<SongBlob | undefined>;
+	exists:(songId: number, trackId: number, version: number) => Promise<boolean>;
+	get:(songId: number, trackId: number, version: number) => Promise<SongBlob | undefined>;
 	put:(song: SongBlob) => Promise<undefined>;
+	vacuum:() => Promise<undefined>;
 }
 
 interface SongStoreDatabase {
@@ -30,7 +27,7 @@ interface SongStoreDatabase {
 
 const _songStoreCache: SongStoreDatabase = {};
 
-export function getSongStore():ISongStore {
+export function CreateSongStore():ISongStore {
 	const initialize = (): Promise<undefined> => {
 		return new Promise<undefined>((resolve, reject) => {
 			// Already open?
@@ -46,8 +43,8 @@ export function getSongStore():ISongStore {
 				return;
 			}
 
-			Log('verbose', 'Opening songstore db...');
-			const request = indexDb.open('songstore', 1);
+			Log('verbose', 'Opening songstore db...2');
+			const request = indexDb.open('songstore', 2);
 			request.onsuccess = () => {
 				Log('verbose', 'songstore Opened');
 				_songStoreCache.database = request.result;
@@ -70,22 +67,23 @@ export function getSongStore():ISongStore {
 				const db = request.result;
 
 				// Create an objectStore for this database
-				if (e.newVersion === 1) {
+				if (e.newVersion === 2) {
 					//const objectStore =
-					db.createObjectStore('trackData', { keyPath: ['songId', 'trackId'] });
+					db.deleteObjectStore('trackData');
+					db.createObjectStore('trackData', { keyPath: ['songId', 'trackId', 'version'] });
 					//objectStore.createIndex('blob', 'blob', { unique: false });
 				}
 			};
 		});
 	};
 
-	const exists = (songId: number, trackId: number): Promise<boolean> => {
+	const exists = (songId: number, trackId: number, version: number): Promise<boolean> => {
 		console.log('Checking exists..');
 		return new Promise<boolean>((resolve, reject) => {
 			initialize().then(() => {
 				try {
 					const transaction = _songStoreCache.database!.transaction('trackData', 'readonly');
-					const count = transaction.objectStore('trackData').count([songId, trackId]);
+					const count = transaction.objectStore('trackData').count([songId, trackId, version]);
 					count.onsuccess = () => { resolve(count.result > 0); }
 					count.onerror = () => { reject('Error: ' + count.error); }
 				} catch (error) {
@@ -97,11 +95,11 @@ export function getSongStore():ISongStore {
 		});
 	};
 
-	const get = async (songId: number, trackId: number): Promise<SongBlob | undefined> => {
+	const get = async (songId: number, trackId: number, version: number): Promise<SongBlob | undefined> => {
 		return new Promise<SongBlob | undefined>((resolve, reject) => {
 			initialize().then(() => {
 				const transaction = _songStoreCache.database!.transaction('trackData', 'readwrite');
-				const get = transaction.objectStore('trackData').get([songId, trackId]);
+				const get = transaction.objectStore('trackData').get([songId, trackId, version]);
 				get.onsuccess = () => { resolve(get.result); }
 				get.onerror = () => { reject('Error: ' + get.error); }
 			});
@@ -119,5 +117,16 @@ export function getSongStore():ISongStore {
 		});
 	};
 
-	return { initialize, exists, get, put };
+	const vacuum = async (): Promise<undefined> => {
+		return new Promise<undefined>((resolve, reject) => {
+			initialize().then(() => {
+				const transaction = _songStoreCache.database!.transaction('trackData', 'readwrite');
+				// TODO: Loop through keys:
+				// 	where multiple versions, prune old versions of songs
+				//  remove songs not accessed in last 30 days
+			});
+		});
+	}
+
+	return { initialize, exists, get, put, vacuum };
 }

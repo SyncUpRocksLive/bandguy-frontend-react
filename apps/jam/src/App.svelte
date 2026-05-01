@@ -2,7 +2,7 @@
 	import { QueryClientProvider } from '@tanstack/svelte-query';
 	import { auth } from "./Auth.svelte";
 	import { router } from "./Router.svelte";
-	import Login from "./Components/Login.svelte";
+	import Login from "./Components/User/Login.svelte";
 	import Home from "./Components/Area/Home.svelte";
 	import SetList from "./Components/Area/SetList.svelte";
 	import SetView from "./Components/Area/SetView.svelte";
@@ -11,6 +11,12 @@
 	import { syncStore } from "./Stores/SyncStore.svelte"
 	import { queryClient } from './QueryClient';
 	import { PeerOperationMode } from './Types/Types';
+	import { onMount } from 'svelte';
+	import { appState } from './State.svelte';
+
+	onMount(async () => {
+    	await appState.loadFromStorage();
+  	});
 
 	$effect(() => {
 
