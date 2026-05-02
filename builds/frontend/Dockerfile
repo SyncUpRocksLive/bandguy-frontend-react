@@ -35,7 +35,7 @@ COPY apps/mixingroom/index.html ./apps/mixingroom/
 
 COPY packages/ ./packages/
 
-RUN ls -R src/
+RUN ls -R ./apps/jam/src/
 
 RUN npm run build --workspaces
 
