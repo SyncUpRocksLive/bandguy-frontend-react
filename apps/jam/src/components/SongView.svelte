@@ -32,11 +32,9 @@
 			{@const meta = $syncStore.currentSong.tracks.find(t => t.id === track.id)!}
 
 			<div class="lyrics-container">
-				{#if track.loading}
-					Loading {meta.name}...
-				{:else if track.error}
+				{#if track.error}
 					Failed loading {meta.name}: {track.error}
-				{:else if track.data?.type === 'lyrics'}
+				{:else if !track.loading && track.data?.type === 'lyrics'}
 					{#if meta.format === 'Lyric'}
 						<BasicLyricViewer lyrics={track.data.content} tick={$syncStore.playbackTimeMilliseconds} />
 					{/if}

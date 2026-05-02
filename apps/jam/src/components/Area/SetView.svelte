@@ -3,10 +3,11 @@
 	import { createQuery } from '@tanstack/svelte-query';
 	import { syncStore } from '@/Stores/SyncStore.svelte';
 	import { SongPlayStatus } from '@/Types/Types';
-	import { LogVerbose } from '@shared/services/Logger';
+	import { LogInfo, LogVerbose } from '@shared/services/Logger';
 	import SongView from '@/Components/SongView.svelte';
 	import { getSetComplete } from '@shared/services/syncuprocks/musician/Api';
 	import type { Song } from '@shared/services/syncuprocks/musician/Types';
+	import { queryClient } from '@/QueryClient';
 
 	interface Props {
 		setId: number;
@@ -29,7 +30,12 @@
 	}));
 
 	function loadSong(song: Song) {
-		syncStore.updateState({ currentSongId: song.id, currentSong: song });
+		if ($syncStore.currentSongId === song.id) {
+			syncStore.updateState({ songPlayStatus: SongPlayStatus.Play });
+			return;
+		}
+
+		syncStore.updateState({ currentSongId: song.id, currentSong: song, songPlayStatus: SongPlayStatus.Play });
 		// TODO: Only load tracks we want to see - provide filter to limit
 		syncStore.ensureCurrentSongLoaded();
 	}
@@ -42,20 +48,38 @@
 		syncStore.updateState({ songPlayStatus: SongPlayStatus.Pause });
 	}
 
-	function formatDuration(duration: number): string {
-		const totalSeconds = Math.floor(duration / 1000);
-		const mins = Math.floor(totalSeconds / 60);
-		const secs = totalSeconds % 60;
-		return `${mins}:${secs.toString().padStart(2, '0')}`;
+	function nextSong() {
+		if (query.isLoading || !query.data || !query.data.ok || query.data.value.songs.length === 0) {
+			LogInfo("No Valid State");
+			return;
+		}
+
+		let nextSong: Song = undefined; 
+		if (!$syncStore.currentSong) {
+			nextSong = query.data.value.songs[0];
+		} else {
+			const currentIndex = query.data.value.songs.indexOf($syncStore.currentSong);
+			if (currentIndex < 0) {
+				nextSong = query.data.value.songs[0];
+			} else if (currentIndex + 1 >= query.data.value.songs.length) {
+				// Reach end, stop
+				pauseSong();
+			} else {
+				nextSong = query.data.value.songs[currentIndex + 1];
+			}
+		}
+
+		// TODO: Scroll into view
+		loadSong(nextSong);
 	}
 
 	// Update state
 	$effect(() => {
+		// TODO: Move to onMount - also, set first song as selected after query loads
 		syncStore.updateState({currentSetId: setId})
 	});
 
 	onDestroy(() => {
-    	// This runs when the component unmounts
     	console.log("Cleaning up downstream state...");
 		syncStore.updateState({
 			currentSetId: undefined,
@@ -63,8 +87,6 @@
 			currentSong: undefined,
 			songPlayStatus: SongPlayStatus.Stop
 		});
-
-		//syncStore.setSong(undefined, undefined, undefined);
   	});
 
 	const errorMessage = $derived.by(() => {
@@ -110,7 +132,7 @@
 					</button>
 					<button
 						class="control-btn"
-						onclick={pauseSong}
+						onclick={nextSong}
 						title="Next"
 					>
 						⏭
