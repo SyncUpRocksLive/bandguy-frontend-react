@@ -35,6 +35,8 @@ COPY apps/mixingroom/index.html ./apps/mixingroom/
 
 COPY packages/ ./packages/
 
+RUN ls -R src/
+
 RUN npm run build --workspaces
 
 # Stage 2: Production
