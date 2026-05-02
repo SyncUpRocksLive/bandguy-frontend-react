@@ -13,6 +13,7 @@ export interface ConnectedUser extends UserState {
 }
 
 export enum PeerOperationMode {
+	None = 'None',
 	Solo = 'Solo',
 	Host = 'Host',
 	Guest = 'Guest'

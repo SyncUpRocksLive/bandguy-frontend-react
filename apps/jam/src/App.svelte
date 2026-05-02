@@ -25,7 +25,7 @@
 		} else if (router.route.area.startsWith("Solo")) {
 			syncStore.updateState({peerMode: PeerOperationMode.Solo});
 		} else {
-			syncStore.updateState({peerMode: PeerOperationMode.Guest});
+			syncStore.updateState({peerMode: PeerOperationMode.None});
 		}
 	});
 

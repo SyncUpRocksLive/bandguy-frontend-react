@@ -32,7 +32,7 @@ function createSyncStore () {
 	let state: SyncStoreItems;
 
 	const { subscribe, update } = writable<SyncStoreItems>({
-		peerMode: PeerOperationMode.Solo,
+		peerMode: PeerOperationMode.None,
 		availableRemoteChannels: undefined,
 		connectedChannelDetail: undefined,
 		currentSetId: undefined,

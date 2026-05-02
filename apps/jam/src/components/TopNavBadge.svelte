@@ -3,7 +3,7 @@
 	import { msToHMS } from '@shared/display/DisplayHelpers'
 </script>
 
-<div>
+<div style="color: aliceblue;">
 	[ {msToHMS($syncStore.plabackTimeMilliseconds) } :
 	{$syncStore.currentSong ? msToHMS($syncStore.currentSong.durationMilliseconds) : '--:--' } ] {$syncStore.currentSong?.name ?? '--'}
 </div>
