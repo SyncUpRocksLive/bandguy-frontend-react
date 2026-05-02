@@ -1,8 +1,9 @@
 <script lang="ts">
-	import { onMount, createEventDispatcher } from 'svelte';
+	import { onMount } from 'svelte';
 	import { syncStore } from "@/Stores/SyncStore.svelte"
 	import { SongPlayStatus } from '../Types/Types';
 	import type { Song } from '@shared/services/syncuprocks/musician/Types';
+	import BasicLyricViewer from './SongPlayback/BasicLyricViewer.svelte';
 
 	interface Props {
 		song: Song;
@@ -13,87 +14,6 @@
 	let isPlaying = $state(false);
 	let currentTime = $state(0);
 	let duration = $state(0);
-	let videoElement = $state<HTMLVideoElement>();
-
-	const dispatch = createEventDispatcher();
-
-	onMount(() => {
-		// Initialize video player if available
-		if (videoElement) {
-			videoElement.addEventListener('timeupdate', handleTimeUpdate);
-			videoElement.addEventListener('loadedmetadata', handleLoadedMetadata);
-			videoElement.addEventListener('ended', handleEnded);
-		}
-	});
-
-	function handleTimeUpdate() {
-		if (videoElement) {
-			currentTime = videoElement.currentTime * 1000; // Convert to milliseconds
-		}
-	}
-
-	function handleLoadedMetadata() {
-		if (videoElement) {
-			duration = videoElement.duration * 1000; // Convert to milliseconds
-		}
-	}
-
-	function handleEnded() {
-		isPlaying = false;
-		//appState.updateStore({ songPlayStatus: SongPlayStatus.Stop });
-		//dispatch('ended');
-	}
-
-	function play() {
-		if (videoElement) {
-			videoElement.play();
-			isPlaying = true;
-			//appState.updateStore({ songPlayStatus: SongPlayStatus.Play });
-		}
-	}
-
-	function pause() {
-		if (videoElement) {
-			videoElement.pause();
-			isPlaying = false;
-			//appState.updateStore({ songPlayStatus: SongPlayStatus.Pause });
-		}
-	}
-
-	function stop() {
-		if (videoElement) {
-			videoElement.pause();
-			videoElement.currentTime = 0;
-			isPlaying = false;
-			currentTime = 0;
-			//appState.updateStore({ songPlayStatus: SongPlayStatus.Stop });
-		}
-	}
-
-	function seek(time: number) {
-		if (videoElement) {
-			videoElement.currentTime = time / 1000; // Convert from milliseconds
-			currentTime = time;
-		}
-	}
-
-	function formatTime(ms: number): string {
-		const totalSeconds = Math.floor(ms / 1000);
-		const mins = Math.floor(totalSeconds / 60);
-		const secs = totalSeconds % 60;
-		return `${mins}:${secs.toString().padStart(2, '0')}`;
-	}
-
-	// Reactive statement to sync with global state
-	// $effect(() => {
-	// 	if (appState.store.songPlayStatus === SongPlayStatus.Play && !isPlaying) {
-	// 		play();
-	// 	} else if (appState.store.songPlayStatus === SongPlayStatus.Pause && isPlaying) {
-	// 		pause();
-	// 	} else if (appState.store.songPlayStatus === SongPlayStatus.Stop) {
-	// 		stop();
-	// 	}
-	// });
 </script>
 
 <div class="song-view">
@@ -103,19 +23,28 @@
 			min="0"
 			max={duration}
 			value={currentTime}
-			oninput={(e) => seek(parseInt(e.currentTarget.value))}
 			class="seek-bar"
 		/>
 	</div>
 
-	<div class="video-container">
+	{#if $syncStore.currentSong && $syncStore.currentSongTracks}
+		{#each $syncStore.currentSongTracks as track}
+			{@const meta = $syncStore.currentSong.tracks.find(t => t.id === track.id)!}
 
-	</div>
+			<div class="lyrics-container">
+				{#if track.loading}
+					Loading {meta.name}...
+				{:else if track.error}
+					Failed loading {meta.name}: {track.error}
+				{:else if track.data?.type === 'lyrics'}
+					{#if meta.format === 'Lyric'}
+						<BasicLyricViewer lyrics={track.data.content} tick={$syncStore.playbackTimeMilliseconds} />
+					{/if}
+				{/if}
+			</div>
+		{/each}
+	{/if}
 
-	<div class="lyrics-container">
-		<!-- Basic lyrics display - could be enhanced with BasicLyricViewer logic -->
-
-	</div>
 </div>
 
 <style>

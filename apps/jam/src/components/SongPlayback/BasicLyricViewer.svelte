@@ -1,5 +1,18 @@
 <script lang="ts">
-	import type { Lyric, LyricGroup, LyricLine } from './types';
+	import type { Line, Lyric, LyricFormatVersion } from '@shared/parsers/lyrics/Lyrics';
+
+	const LinesPerGroup = 2;
+	const VisibleGroups = 2;
+
+	interface LyricGroup {
+		groupRow: number;
+		groupIndex: number;
+		start: number;
+		end: number;
+		alpha: number;
+		duration: number;
+		lyricLines: Line[];
+	}
 
 	interface Props {
 		lyrics: Lyric;
@@ -7,9 +20,6 @@
 	}
 
 	let { lyrics, tick }: Props = $props();
-
-	const LinesPerGroup = 2;
-	const VisibleGroups = 2;
 
 	let groupData: LyricGroup[] = $state([]);
 	let visibleGroups: LyricGroup[] = $state([]);

@@ -1,15 +1,23 @@
-import { PeerOperationMode, SongPlayStatus } from "@/Types/Types";
-import type { Song } from "@shared/services/syncuprocks/musician/Types";
-import { JamChannelDetail } from "@shared/services/syncuprocks/musician/JamChannels";
-import { writable, get } from "svelte/store";
+import { PeerOperationMode, SongPlayStatus } from '@/Types/Types';
+import type { Song, Track } from '@shared/services/syncuprocks/musician/Types';
+import { JamChannelDetail } from '@shared/services/syncuprocks/musician/JamChannels';
+import { writable, get } from 'svelte/store';
 import { CreateSongStore, SongBlob } from '@/Support/Stores/SongStore';
-import { LogError, LogInfo, LogVerbose } from "@shared/services/Logger";
-import { getFilesetDataByVersion } from "@shared/services/syncuprocks/musician/Api";
+import { LogError, LogInfo, LogVerbose } from '@shared/services/Logger';
+import { getFilesetDataByVersion } from '@shared/services/syncuprocks/musician/Api';
+import { lyricsParser } from '@shared/parsers/lyrics/LyricsFileParser';
+import type { Lyric } from '@shared/parsers/lyrics/Lyrics';
+
+export type TrackData = 
+    | { type: 'audio' | 'binary'; content: Blob }
+    | { type: 'lyrics'; content: Lyric }
+    | { type: 'none'; content: undefined };
 
 export interface TrackState {
 	id: number;
 	loading: boolean,
-	data?: Blob,
+	error?: string,
+	data?: TrackData,
 }
 
 export interface SyncStoreItems {
@@ -20,7 +28,7 @@ export interface SyncStoreItems {
 	currentSongId?: number;
 	currentSong?: Song,
 	currentSongTracks?: TrackState[];
-	plabackTimeMilliseconds: number;
+	playbackTimeMilliseconds: number;
 	songPlayStatus: SongPlayStatus;
 }
 
@@ -39,7 +47,7 @@ function createSyncStore () {
 		currentSongId: undefined,
 		currentSong: undefined,
 		currentSongTracks: undefined,
-		plabackTimeMilliseconds: 0,
+		playbackTimeMilliseconds: 0,
 		songPlayStatus: SongPlayStatus.Stop
 	});
 
@@ -59,6 +67,18 @@ function createSyncStore () {
 
 			return newState;
 		});
+	}
+
+	async function parseBlob(track: Track, blob: Blob, trackState: TrackState): Promise<undefined> {
+		try {
+			if (track.format === 'Lyric') {
+				trackState.data = { type: 'lyrics', content: lyricsParser(await blob.text()) };
+			} else {
+				trackState.error = `Unsupported format ${track.format}`;
+			}
+		} catch (e: any) {
+			trackState.error = e.message;
+		}
 	}
 
 	// TODO: Take a filter method to filter non-useful tracks
@@ -86,12 +106,21 @@ function createSyncStore () {
 			loading: true,
 			data: undefined
 		}));
-
 		updateState({currentSongTracks: tracks});
+
+		const trackMap = new Map(tracks.map(t => [t.id, t]));
 		
 		await Promise.all(song.tracks.map(async (track) => {
+			if (song !== state.currentSong) {
+				LogInfo("Song changed - skipping loading tracks")
+				return;
+			}
+
+			const trackState = trackMap.get(track.id)!;
+
+			LogVerbose(`Getting '${song.name}' - track '${track.name}'`);
+
 			// Already in db?
-			LogVerbose(`Grabing track '${track.name}' for song '${song.name}'`);
 			if (await songStore.exists(song.id, track.id, track.versionNumber!)) {
 				const songBlob = await songStore.get(song.id, track.id, track.versionNumber!);
 
@@ -100,71 +129,54 @@ function createSyncStore () {
 					return;
 				}
 
-				if (songBlob) {				
-					const trackState = tracks.find((t) => t.id === track.id);
-					if (trackState) {
-						trackState.data = songBlob.data;
-						trackState.loading = false;
+				if (songBlob) {
+					LogVerbose(`Song '${song.name}' - track '${track.name}' - returned from cache`);
+					await parseBlob(track, songBlob.data, trackState);
+					trackState.loading = false;
 
-						updateState({currentSongTracks: tracks});
-					}
+					updateState({currentSongTracks: Array.from(trackMap.values())});
+					return;
 				}
-			}
-
-			// TODO - check if song changed - if so - bail out
-
-			// No - load from API and cache
-			const data = await getFilesetDataByVersion(track.fileSetId!, track.versionNumber!);
-			if (data.ok) {
-				//data.value
-				// Let's go ahead and ensure we cache before checking current state
 			}
 
 			if (song !== state.currentSong) {
 				LogInfo("Song changed - skipping loading tracks")
 				return;
 			}
+
+			// load from API and cache
+			const data = await getFilesetDataByVersion(track.fileSetId!, track.versionNumber!);
+			trackState.loading = false;
+
+			if (data.ok) {
+				LogVerbose(`Song '${song.name}' - track '${track.name}' - returned from web`);
+
+				// Let's go ahead and ensure we cache before checking current state
+				await songStore.put({
+					songId: song.id,
+					trackId: track.id,
+					version: track.versionNumber!,
+					format: track.format,
+					timestamp: Date.now(),
+					data: data.value,
+				});
+
+				await parseBlob(track, data.value, trackState);;
+				
+			} else {
+				trackState.error = data.error.message;				
+			}
+
+			if (song !== state.currentSong) {
+				LogInfo("Song changed - skipping loading tracks")
+				return;
+			}
+
+			updateState({currentSongTracks: Array.from(trackMap.values())});
 		}));
 
 		LogVerbose("Completed grabbing tracks");
 	}
-
-	// async function loadSongTrack(songId: number, trackId: number, version: number) {
-    //     const thisRequestKey = `${songId}-${trackId}-${version}`;
-    //     activeRequestKey = thisRequestKey;
-
-    //     // 1. Clear current song in UI immediately to prevent "stale" flashes
-    //     updateState({ currentSong: undefined });
-
-    //     // 2. Check Cache
-    //     const cached = await songStore.get(songId, trackId, version);
-    //     if (cached && activeRequestKey === thisRequestKey) {
-    //         updateState({ currentSong: { ...state.currentSong, blob: cached } });
-    //         return; 
-    //     }
-
-    //     // 3. Fetch from S3 (Parallel, No Abort)
-    //     try {
-    //         const freshData = await fetchFromS3(songId, trackId, version);
-            
-    //         const songBlob: SongBlob = {
-    //             songId, trackId, version,
-    //             format: 'json',
-    //             timestamp: Date.now(),
-    //             data: freshData
-    //         };
-
-    //         // ALWAYS cache the result
-    //         await songStore.put(songBlob);
-
-    //         // ONLY update UI if the user is still waiting for THIS specific song
-    //         if (activeRequestKey === thisRequestKey) {
-    //             updateState({ currentSong: { ...state.currentSong, blob: songBlob } });
-    //         }
-    //     } catch (e) {
-    //         LogError("Background fetch failed", e);
-    //     }
-    // }
 
 	return {
 		subscribe,

@@ -29,9 +29,8 @@
 	}));
 
 	function loadSong(song: Song) {
-		console.log(`setting song=${song.name}`);
 		syncStore.updateState({ currentSongId: song.id, currentSong: song });
-		// TODO: Only load tracks we want to see
+		// TODO: Only load tracks we want to see - provide filter to limit
 		syncStore.ensureCurrentSongLoaded();
 	}
 

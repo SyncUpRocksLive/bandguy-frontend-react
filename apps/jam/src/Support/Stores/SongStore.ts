@@ -77,7 +77,6 @@ export function CreateSongStore():ISongStore {
 	};
 
 	const exists = (songId: number, trackId: number, version: number): Promise<boolean> => {
-		console.log('Checking exists..');
 		return new Promise<boolean>((resolve, reject) => {
 			initialize().then(() => {
 				try {

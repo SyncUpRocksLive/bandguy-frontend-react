@@ -4,7 +4,7 @@
 </script>
 
 <div style="color: aliceblue;">
-	[ {msToHMS($syncStore.plabackTimeMilliseconds) } :
+	[ {msToHMS($syncStore.playbackTimeMilliseconds) } :
 	{$syncStore.currentSong ? msToHMS($syncStore.currentSong.durationMilliseconds) : '--:--' } ] {$syncStore.currentSong?.name ?? '--'}
 </div>
 

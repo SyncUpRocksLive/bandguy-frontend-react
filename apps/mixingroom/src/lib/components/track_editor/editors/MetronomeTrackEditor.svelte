@@ -68,6 +68,25 @@
 			lastTapTime = 0;
 		}, 3000);
 	}
+
+
+    // import { syncStore } from '@/Stores/SyncStore.svelte';
+
+    // let lastBeat = 0;
+    // const bpm = 120; // This should come from your song object
+    // const msPerBeat = 60000 / bpm;
+
+    // function frame(time) {
+    //     const currentTime = $syncStore.playbackTimeMilliseconds;
+        
+    //     if (currentTime - lastBeat >= msPerBeat) {
+    //         triggerVisualFlash();
+    //         lastBeat = currentTime;
+    //     }
+        
+    //     requestAnimationFrame(frame);
+    // }
+
 </script>
 
 <div class="metronome-editor">
