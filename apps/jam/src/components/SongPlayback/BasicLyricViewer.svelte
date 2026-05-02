@@ -92,7 +92,7 @@
 		}
 
 		groupData.forEach(g => {
-			g.alpha = 100;
+			g.alpha = 1;
 		});
 
 		let firstGroup = groupData.findIndex(g => tick < g.start) - 1;
@@ -106,7 +106,8 @@
 				const fadeOut = 1.0 - (tick - g.start) / midpoint;
 				firstGroup = firstGroup - 1;
 				g = groupData[firstGroup];
-				g.alpha = fadeOut * 100;
+				// TODO: Change - not too frequent updates, but more granular steps
+				g.alpha = Math.max(.3, fadeOut / 100);
 			}
 
 			const rows = groupData
@@ -123,7 +124,7 @@
 		{#each visibleGroups as group (group.groupIndex)}
 			<div
 				class="lyric-group"
-				style="opacity: {group.alpha / 100}; transition: opacity 0.1s ease-out"
+				style="opacity: {group.alpha}; transition: opacity 0.1s ease-out"
 			>
 				{#each group.lyricLines as line (line.time)}
 					<div class="lyric-line">

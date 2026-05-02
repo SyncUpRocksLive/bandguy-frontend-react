@@ -8,10 +8,10 @@ import { getFilesetDataByVersion } from '@shared/services/syncuprocks/musician/A
 import { lyricsParser } from '@shared/parsers/lyrics/LyricsFileParser';
 import type { Lyric } from '@shared/parsers/lyrics/Lyrics';
 
-export type TrackData = 
-    | { type: 'audio' | 'binary'; content: Blob }
-    | { type: 'lyrics'; content: Lyric }
-    | { type: 'none'; content: undefined };
+export type TrackData =
+	| { type: 'audio' | 'binary'; content: Blob }
+	| { type: 'lyrics'; content: Lyric }
+	| { type: 'none'; content: undefined };
 
 export interface TrackState {
 	id: number;
@@ -33,11 +33,14 @@ export interface SyncStoreItems {
 }
 
 // This store handles current song status, modes, tracks, setlists, etc
-function createSyncStore () {
+function createSyncStore() {
 	const songStore = CreateSongStore();
 
 	// Local mirror of the state
 	let state: SyncStoreItems;
+	let previousStatus: SongPlayStatus;
+	let timerId: number | null = null;
+	let lastTick: number = 0;
 
 	const { subscribe, update } = writable<SyncStoreItems>({
 		peerMode: PeerOperationMode.None,
@@ -52,9 +55,32 @@ function createSyncStore () {
 	});
 
 	// Keep the local mirror updated
-    const unsubscribe = subscribe((value) => {
-        state = value;
-    });
+	const unsubscribe = subscribe((value) => {
+		// 1. Detect if SongPlayStatus has changed
+		const statusChanged = previousStatus !== value.songPlayStatus;
+		
+		// 2. Update the mirror and tracker
+		state = value;
+		previousStatus = value.songPlayStatus;
+
+		if (!state.currentSong) {
+			stopEngine();
+			return;
+		}
+
+		// 3. Act on the change
+		if (statusChanged) {
+			if (state.songPlayStatus === SongPlayStatus.Play) {
+				startEngine();
+			} else {
+				stopEngine();
+			}
+		}
+
+		if (state.playbackTimeMilliseconds >= state.currentSong.durationMilliseconds) {
+			// TODO: Emit song finished - 
+		}
+	});
 
 	function updateState(patch: Partial<SyncStoreItems>) {
 		update((state) => {
@@ -67,6 +93,36 @@ function createSyncStore () {
 
 			return newState;
 		});
+	}
+
+	function startEngine() {
+		if (timerId) return; // Guard against double-starts
+		LogInfo("Engine: Started");
+		lastTick = performance.now();
+		tick();
+	}
+
+	function stopEngine() {
+		if (timerId) {
+			LogInfo("Engine: Stopped");
+			cancelAnimationFrame(timerId);
+			timerId = null;
+		}
+	}
+
+	function tick() {
+		const now = performance.now();
+		const delta = now - lastTick;
+		lastTick = now;
+
+		// Update the store directly
+		update((s) => ({
+			...s,
+			playbackTimeMilliseconds: s.playbackTimeMilliseconds + delta
+		}));
+
+		// Request the next frame
+		timerId = requestAnimationFrame(tick);
 	}
 
 	async function parseBlob(track: Track, blob: Blob, trackState: TrackState): Promise<undefined> {
@@ -106,10 +162,10 @@ function createSyncStore () {
 			loading: true,
 			data: undefined
 		}));
-		updateState({currentSongTracks: tracks});
+		updateState({ currentSongTracks: tracks });
 
 		const trackMap = new Map(tracks.map(t => [t.id, t]));
-		
+
 		await Promise.all(song.tracks.map(async (track) => {
 			if (song !== state.currentSong) {
 				LogInfo("Song changed - skipping loading tracks")
@@ -134,7 +190,7 @@ function createSyncStore () {
 					await parseBlob(track, songBlob.data, trackState);
 					trackState.loading = false;
 
-					updateState({currentSongTracks: Array.from(trackMap.values())});
+					updateState({ currentSongTracks: Array.from(trackMap.values()) });
 					return;
 				}
 			}
@@ -162,9 +218,9 @@ function createSyncStore () {
 				});
 
 				await parseBlob(track, data.value, trackState);;
-				
+
 			} else {
-				trackState.error = data.error.message;				
+				trackState.error = data.error.message;
 			}
 
 			if (song !== state.currentSong) {
@@ -172,7 +228,7 @@ function createSyncStore () {
 				return;
 			}
 
-			updateState({currentSongTracks: Array.from(trackMap.values())});
+			updateState({ currentSongTracks: Array.from(trackMap.values()) });
 		}));
 
 		LogVerbose("Completed grabbing tracks");

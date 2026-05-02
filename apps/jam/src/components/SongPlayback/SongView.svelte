@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { syncStore } from "@/Stores/SyncStore.svelte"
-	import { SongPlayStatus } from '../Types/Types';
-	import type { Song } from '@shared/services/syncuprocks/musician/Types';
-	import BasicLyricViewer from './SongPlayback/BasicLyricViewer.svelte';
+	import { onMount } from "svelte";
+	import { syncStore } from "@/Stores/SyncStore.svelte";
+	import { SongPlayStatus } from "../../Types/Types";
+	import type { Song } from "@shared/services/syncuprocks/musician/Types";
+	import BasicLyricViewer from "./BasicLyricViewer.svelte";
 
 	interface Props {
 		song: Song;
@@ -11,38 +11,67 @@
 
 	let { song }: Props = $props();
 
-	let isPlaying = $state(false);
-	let currentTime = $state(0);
-	let duration = $state(0);
+	function restart() {
+		syncStore.updateState({ playbackTimeMilliseconds: 0 });
+	}
 </script>
 
 <div class="song-view">
 	<div class="player-controls">
+		<button
+			onclick={() => restart()}
+			title="Restart"
+			class="control-button"
+			disabled={!$syncStore.currentSong}
+		>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				width="24"
+				height="24"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2.5"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			>
+				<!-- Circular path starts at 3.6 9 (slightly shifted) to create a gap -->
+				<path d="M3.6 9a9 9 0 1 1-1.28 7.35" />
+				<!-- Arrow head at the top-left -->
+				<path d="M3 3v6h6" />
+			</svg>
+		</button>
+
 		<input
 			type="range"
 			min="0"
-			max={duration}
-			value={currentTime}
+			step="0"
+			max={song.durationMilliseconds}
+			bind:value={$syncStore.playbackTimeMilliseconds}
 			class="seek-bar"
 		/>
 	</div>
 
 	{#if $syncStore.currentSong && $syncStore.currentSongTracks}
 		{#each $syncStore.currentSongTracks as track}
-			{@const meta = $syncStore.currentSong.tracks.find(t => t.id === track.id)!}
+			{@const meta = $syncStore.currentSong.tracks.find(
+				(t) => t.id === track.id,
+			)!}
 
 			<div class="lyrics-container">
 				{#if track.error}
 					Failed loading {meta.name}: {track.error}
-				{:else if !track.loading && track.data?.type === 'lyrics'}
-					{#if meta.format === 'Lyric'}
-						<BasicLyricViewer lyrics={track.data.content} tick={$syncStore.playbackTimeMilliseconds} />
+				{:else if !track.loading && track.data?.type === "lyrics"}
+					{#if meta.format === "Lyric"}
+						<BasicLyricViewer
+							lyrics={track.data.content}
+							tick={$syncStore.playbackTimeMilliseconds}
+						/>
 					{/if}
 				{/if}
 			</div>
 		{/each}
 	{/if}
-
 </div>
 
 <style>
@@ -50,7 +79,7 @@
 		display: flex;
 		flex-direction: column;
 		height: 100%;
-		padding: 20px;
+		padding: 2px;
 		color: white;
 	}
 
@@ -71,10 +100,11 @@
 
 	.player-controls {
 		display: flex;
-		flex-direction: column;
-		gap: 10px;
-		margin-bottom: 20px;
-		padding: 15px;
+		flex-direction: row;
+		align-items: center;
+		gap: 1px;
+		margin-bottom: 10px;
+		padding: 2px;
 		background: rgba(0, 0, 0, 0.5);
 		border-radius: 8px;
 	}
@@ -164,7 +194,7 @@
 		flex: 1;
 		background: rgba(0, 0, 0, 0.3);
 		border-radius: 8px;
-		padding: 20px;
+		padding: 2px;
 		overflow-y: auto;
 	}
 
@@ -181,5 +211,25 @@
 		align-items: center;
 		height: 100%;
 		color: rgba(255, 255, 255, 0.7);
+	}
+
+	.control-button {
+		background: none;
+		border: none;
+		color: white;
+		cursor: pointer;
+		font-size: 1.5rem;
+		padding: 0.5rem;
+	}
+
+	.control-button:hover {
+		background-color: rgba(210, 36, 36, 0.242);
+		border-radius: 0.25rem;
+	}
+
+	.control-button:active {
+		background-color: rgba(255, 255, 255, 0.2); /* Slightly brighter/darker than hover */
+		transform: translateY(1px) scale(0.96);    /* Moves it down and shrinks it slightly */
+		transition: transform 0.05s;               /* Makes the "click" feel snappier */
 	}
 </style>

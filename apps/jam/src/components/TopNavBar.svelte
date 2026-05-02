@@ -3,7 +3,7 @@
 	import { auth } from '../Auth.svelte';
 	import { router } from '../Router.svelte';
 	import { syncStore } from '@/Stores/SyncStore.svelte';
-	import { PeerOperationMode } from '../Types/Types';
+	import { PeerOperationMode, SongPlayStatus } from '../Types/Types';
 	import Configuration from './NavModals/Configuration.svelte';
 	import HostModeStatus from './NavModals/HostModeStatus.svelte';
 	import GuestModeStatus from './NavModals/GuestModeStatus.svelte';
@@ -30,7 +30,9 @@
                 <div class="bar" class:open={isMenuOpen}></div>
             </button>
 
-			<TopNavBadge />
+			{#if $syncStore.songPlayStatus !== SongPlayStatus.Stop}
+				<TopNavBadge />
+			{/if}
 
 			<!-- Right Side Actions (Status/Profile always visible) -->
             <div class="actions">

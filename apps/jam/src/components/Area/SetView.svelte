@@ -4,7 +4,7 @@
 	import { syncStore } from '@/Stores/SyncStore.svelte';
 	import { SongPlayStatus } from '@/Types/Types';
 	import { LogInfo, LogVerbose } from '@shared/services/Logger';
-	import SongView from '@/Components/SongView.svelte';
+	import SongView from '@/Components/SongPlayback/SongView.svelte';
 	import { getSetComplete } from '@shared/services/syncuprocks/musician/Api';
 	import type { Song } from '@shared/services/syncuprocks/musician/Types';
 	import { queryClient } from '@/QueryClient';
@@ -35,7 +35,12 @@
 			return;
 		}
 
-		syncStore.updateState({ currentSongId: song.id, currentSong: song, songPlayStatus: SongPlayStatus.Play });
+		syncStore.updateState({ 
+			currentSongId: song.id, 
+			currentSong: song, 
+			playbackTimeMilliseconds: 0,
+			songPlayStatus: SongPlayStatus.Play });
+
 		// TODO: Only load tracks we want to see - provide filter to limit
 		syncStore.ensureCurrentSongLoaded();
 	}
@@ -85,6 +90,7 @@
 			currentSetId: undefined,
 			currentSongId: undefined,
 			currentSong: undefined,
+			playbackTimeMilliseconds: 0,
 			songPlayStatus: SongPlayStatus.Stop
 		});
   	});
