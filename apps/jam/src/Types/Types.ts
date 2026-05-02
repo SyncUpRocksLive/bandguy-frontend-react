@@ -1,4 +1,4 @@
-import { Client } from "@/Types/Client";
+import { type Client } from "@/Types/Client";
 
 export interface UserState {
 	displayName: string;

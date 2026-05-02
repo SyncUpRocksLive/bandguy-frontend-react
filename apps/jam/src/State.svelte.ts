@@ -1,4 +1,3 @@
-import type { MessageBusEvent } from '@/Types/MessageBus';
 
 class AppState {
 	// Global state equivalent to react-superstore

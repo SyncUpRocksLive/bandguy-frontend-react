@@ -27,7 +27,8 @@
 </button>
 
 {#if show}
-	<div class="status-overlay" onclick={() => setShow(false)} onkeydown={(e) => { if (e.key === 'Escape') setShow(false); }} role="dialog" aria-modal="true" tabindex="-1">
+	TODO
+	<!-- <div class="status-overlay" onclick={() => setShow(false)} onkeydown={(e) => { if (e.key === 'Escape') setShow(false); }} role="dialog" aria-modal="true" tabindex="-1">
 		<div class="status-popover" onclick={(e) => e.stopPropagation()}>
 			<div class="status-header">
 				<h4>Band Member {appState.store.user?.displayName}</h4>
@@ -60,7 +61,7 @@
 				{/if}
 			</div>
 		</div>
-	</div>
+	</div> -->
 {/if}
 
 <style>

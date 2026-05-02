@@ -1,26 +1,26 @@
 <script lang="ts">
-	import { appState } from '../../State.svelte';
-	import { LogInfo } from '@shared/services/Logger';
-	import { broadcastMessage } from '../../Support/Services/MessageBus';
-	import { MessageBusActionType } from '../../Types/MessageBus';
+	//import { appState } from '../../State.svelte';
+	//import { LogInfo } from '@shared/services/Logger';
+	//import { broadcastMessage } from '../../Support/Services/MessageBus';
+	//import { MessageBusActionType } from '../../Types/MessageBus';
 
 	let show = $state(false);
 
-	function bootFromBand(user: any) {
-		LogInfo(`Kicking User:Instance (${user.username} out of band!)`);
-		broadcastMessage({
-			data: {
-				type: MessageBusActionType.KICKOUT,
-				userId: user.userId,
-				instance: ''
-			}
-		});
-		setShow(false);
-	}
+	// function bootFromBand(user: any) {
+	// 	LogInfo(`Kicking User:Instance (${user.username} out of band!)`);
+	// 	broadcastMessage({
+	// 		data: {
+	// 			type: MessageBusActionType.KICKOUT,
+	// 			userId: user.userId,
+	// 			instance: ''
+	// 		}
+	// 	});
+	// 	setShow(false);
+	// }
 
-	function setShow(value: boolean) {
-		show = value;
-	}
+	// function setShow(value: boolean) {
+	// 	show = value;
+	// }
 </script>
 
 <button
@@ -33,7 +33,8 @@
 </button>
 
 {#if show}
-	<div class="status-overlay" onclick={() => setShow(false)} onkeydown={(e) => { if (e.key === 'Escape') setShow(false); }} role="dialog" aria-modal="true" tabindex="-1">
+	TODO
+	<!-- <div class="status-overlay" onclick={() => setShow(false)} onkeydown={(e) => { if (e.key === 'Escape') setShow(false); }} role="dialog" aria-modal="true" tabindex="-1">
 		<div class="status-popover" onclick={(e) => e.stopPropagation()}>
 			<div class="status-header">
 				<h4>Band Leader {appState.store.user?.displayName}</h4>
@@ -63,7 +64,7 @@
 				</div>
 			</div>
 		</div>
-	</div>
+	</div> -->
 {/if}
 
 <style>

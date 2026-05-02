@@ -1,9 +1,9 @@
 import { PeerOperationMode, SongPlayStatus } from '@/Types/Types';
 import type { Song, Track } from '@shared/services/syncuprocks/musician/Types';
-import { JamChannelDetail } from '@shared/services/syncuprocks/musician/JamChannels';
-import { writable, get } from 'svelte/store';
-import { CreateSongStore, SongBlob } from '@/Support/Stores/SongStore';
-import { LogError, LogInfo, LogVerbose } from '@shared/services/Logger';
+import type { JamChannelDetail } from '@shared/services/syncuprocks/musician/JamChannels';
+import { writable } from 'svelte/store';
+import { CreateSongStore } from '@/Support/Stores/SongStore';
+import { LogInfo, LogVerbose } from '@shared/services/Logger';
 import { getFilesetDataByVersion } from '@shared/services/syncuprocks/musician/Api';
 import { lyricsParser } from '@shared/parsers/lyrics/LyricsFileParser';
 import type { Lyric } from '@shared/parsers/lyrics/Lyrics';
