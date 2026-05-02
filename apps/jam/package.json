@@ -1,5 +1,5 @@
 {
-  "name": "temp",
+  "name": "jam",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -20,7 +20,6 @@
   },
   "dependencies": {
     "@tanstack/svelte-query": "^6.1.15",
-    "bootstrap": "^5.3.3",
-    "react-bootstrap": "^2.10.4"
+    "bootstrap": "^5.3.3"
   }
 }
