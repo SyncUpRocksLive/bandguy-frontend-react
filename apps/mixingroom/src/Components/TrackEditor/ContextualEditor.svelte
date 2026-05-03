@@ -1,5 +1,4 @@
 <script lang="ts">
-	import AudioTrackEditor from './Editors/AudioTrackEditor.svelte';
 	import MetronomeTrackEditor from './Editors/MetronomeTrackEditor.svelte';
 	import TextTrackEditor from './Editors/TextTrackEditor.svelte';
 	import type { Track, TrackFormat } from '@shared/services/syncuprocks/musician/Types';
@@ -41,7 +40,7 @@
 		}
 	}
 
-	let currentEditorRef: AudioTrackEditor | MetronomeTrackEditor | TextTrackEditor | null = $state(null);
+	let currentEditorRef: MetronomeTrackEditor | TextTrackEditor | null = $state(null);
 </script>
 
 <div class="contextual-editor">
@@ -76,7 +75,6 @@
 	<!-- Content Area (Format-specific editor) -->
 	<div class="editor-content">
 		{#if track.format === 'audio'}
-			<!-- <AudioTrackEditor {track} {onchange} /> -->
 			 <b>Unsupported format</b>
 		{:else if track.format === 'metronome'}
 			<!-- <MetronomeTrackEditor {track} {onchange} /> -->
