@@ -13,8 +13,11 @@
 		durationMs, 
 		onsave, 
 		oncancel }: Props = $props();
+	//const props: Props = $props();
 
+	// svelte-ignore state_referenced_locally
 	let editName = $state(name);
+	// svelte-ignore state_referenced_locally
 	let editDurationStr = $state(msToHMS(durationMs));
 	let errors = $state<Record<string, string>>({});
 
