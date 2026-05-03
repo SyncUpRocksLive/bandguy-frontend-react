@@ -3,7 +3,7 @@
 	import { deleteSet, getSetsOverview, saveSet, saveSetsOverview } from "@shared/services/syncuprocks/musician/Api";
 	import type { SetOverview } from "@shared/services/syncuprocks/musician/Types";
 	import BasicTableEdit, { type ColumnDefinition, type TableConfig } from "@/Components/BasicTableEdit.svelte";
-	import Upload from "./components/setlist/Upload.svelte";
+	import Upload from "./Components/Setlist/Upload.svelte";
 	import { router } from "@/Router.svelte";
 	import SongEditor from "./Components/Setlist/SongEditor.svelte";
 	
