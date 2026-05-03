@@ -1,7 +1,7 @@
 <script lang="ts">
-	import AudioTrackEditor from './editors/AudioTrackEditor.svelte';
-	import MetronomeTrackEditor from './editors/MetronomeTrackEditor.svelte';
-	import TextTrackEditor from './editors/TextTrackEditor.svelte';
+	import AudioTrackEditor from './Editors/AudioTrackEditor.svelte';
+	import MetronomeTrackEditor from './Editors/MetronomeTrackEditor.svelte';
+	import TextTrackEditor from './Editors/TextTrackEditor.svelte';
 	import type { Track, TrackFormat } from '@shared/services/syncuprocks/musician/Types';
 
 	interface Props {

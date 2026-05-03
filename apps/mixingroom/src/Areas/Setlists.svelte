@@ -5,7 +5,7 @@
 	import BasicTableEdit, { type ColumnDefinition, type TableConfig } from "@/Components/BasicTableEdit.svelte";
 	import Upload from "./components/setlist/Upload.svelte";
 	import { router } from "@/Router.svelte";
-	import SongEditor from "./components/setlist/SongEditor.svelte";
+	import SongEditor from "./Components/Setlist/SongEditor.svelte";
 	
 	let tableRef: BasicTableEdit;
 	let sets: SetOverview[] = [];
