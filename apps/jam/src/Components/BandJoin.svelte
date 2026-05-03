@@ -112,7 +112,7 @@
 </div>
 
 <style>
-	.band-join-container {
+	/* .band-join-container {
 		display: flex;
 		flex-direction: column;
 		height: 100%;
@@ -258,5 +258,5 @@
 
 	.code-submit:hover {
 		background: #218838;
-	}
+	} */
 </style>
