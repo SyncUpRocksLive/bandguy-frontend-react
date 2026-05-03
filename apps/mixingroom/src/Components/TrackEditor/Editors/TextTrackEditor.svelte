@@ -166,7 +166,8 @@
 					placeholder={track.format === 'lyric'
 						? 'Enter lyrics here...\n\n[Verse 1]\nLine 1\nLine 2\n\n[Chorus]\nChorus line'
 						: 'Enter tablature here...\n\ne|--0--2--3--|\nB|--3--1--0--|\nG|--0--0--0--|\n...'}
-				/>
+				></textarea>
+				
 			</div>
 
 			<div class="editor-options">
