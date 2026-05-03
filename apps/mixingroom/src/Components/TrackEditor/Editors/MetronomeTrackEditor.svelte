@@ -8,10 +8,10 @@
 
 	const { track, onchange }: Props = $props();
 
-	let config = $state(track.configuration ? JSON.parse(track.configuration) : {});
-	let bpm = $state(config.bpm || 120);
-	let timeSignature = $state(config.timeSignature || '4/4');
-	let accentPattern = $state(config.accentPattern || '1-0-0-0');
+	let config = $derived(track.configuration ? JSON.parse(track.configuration) : {});
+	let bpm = $derived(config.bpm || 120);
+	let timeSignature = $derived(config.timeSignature || '4/4');
+	let accentPattern = $derived(config.accentPattern || '1-0-0-0');
 	let isTapping = $state(false);
 	let lastTapTime = 0;
 
@@ -25,48 +25,48 @@
 	}
 
 	function updateConfig() {
-		const newConfig = {
-			bpm,
-			timeSignature,
-			accentPattern
-		};
-		onchange?.({
-			...track,
-			configuration: JSON.stringify(newConfig)
-		});
+		// const newConfig = {
+		// 	bpm,
+		// 	timeSignature,
+		// 	accentPattern
+		// };
+		// onchange?.({
+		// 	...track,
+		// 	configuration: JSON.stringify(newConfig)
+		// });
 	}
 
 	function handleBpmChange(value: number) {
-		bpm = Math.max(20, Math.min(300, value));
-		updateConfig();
+		// bpm = Math.max(20, Math.min(300, value));
+		// updateConfig();
 	}
 
 	function handleTimeSignatureChange(value: string) {
-		timeSignature = value;
-		updateConfig();
+		// timeSignature = value;
+		// updateConfig();
 	}
 
 	function handleAccentPatternChange(value: string) {
-		accentPattern = value;
-		updateConfig();
+		// accentPattern = value;
+		// updateConfig();
 	}
 
 	function handleTapTempo() {
-		const now = Date.now();
-		if (isTapping && lastTapTime > 0 && now - lastTapTime < 3000) {
-			const interval = now - lastTapTime;
-			const newBpm = Math.round(60000 / interval);
-			handleBpmChange(newBpm);
-		} else {
-			isTapping = true;
-		}
-		lastTapTime = now;
+		// const now = Date.now();
+		// if (isTapping && lastTapTime > 0 && now - lastTapTime < 3000) {
+		// 	const interval = now - lastTapTime;
+		// 	const newBpm = Math.round(60000 / interval);
+		// 	handleBpmChange(newBpm);
+		// } else {
+		// 	isTapping = true;
+		// }
+		// lastTapTime = now;
 
-		// Reset tapping mode after 3 seconds of inactivity
-		setTimeout(() => {
-			isTapping = false;
-			lastTapTime = 0;
-		}, 3000);
+		// // Reset tapping mode after 3 seconds of inactivity
+		// setTimeout(() => {
+		// 	isTapping = false;
+		// 	lastTapTime = 0;
+		// }, 3000);
 	}
 
 
