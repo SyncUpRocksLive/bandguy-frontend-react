@@ -187,23 +187,6 @@
 		flex-direction: column;
 	}
 
-	.back-btn {
-		position: absolute;
-		bottom: 10px;
-		right: 10px;
-		padding: 0.5rem 1rem;
-		background-color: #6c757d;
-		color: white;
-		border: none;
-		border-radius: 0.25rem;
-		cursor: pointer;
-		z-index: 10;
-	}
-
-	.back-btn:hover {
-		background-color: #5a6268;
-	}
-
 	.set-container {
 		display: flex;
 		flex: 1;
