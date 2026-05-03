@@ -3,9 +3,9 @@
 	import { msToHMS } from "@shared/display/DisplayHelpers";
 	import { deleteSong, getSongsOverview } from "@shared/services/syncuprocks/musician/Api";
 	import type { SongOverview } from "@shared/services/syncuprocks/musician/Types";
-	import BasicTableEdit, { type ColumnDefinition, type TableConfig } from "@/lib/components/BasicTableEdit.svelte";
+	import BasicTableEdit, { type ColumnDefinition, type TableConfig } from "@/Components/BasicTableEdit.svelte";
 	import { router } from "@/Router.svelte";
-	import SongEditor from "./components/song_library/SongEditor.svelte";
+	import SongEditor from "./components/SongLibrary/SongEditor.svelte";
 
 	let tableRef: BasicTableEdit;
 	let songs: SongOverview[] = [];

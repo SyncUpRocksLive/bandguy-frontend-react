@@ -1,5 +1,5 @@
 <script lang="ts">
-	import TrackEditor from '@/lib/components/track_editor/TrackEditor.svelte';
+	import TrackEditor from '@/Components/TrackEditor/TrackEditor.svelte';
 	import SongItemEditor from './SongItemEditor.svelte';
 	import { msToHMS } from '@shared/display/DisplayHelpers';
 	import { getSongComplete, saveTrack, deleteTrack, createTrack, type SongSaveRequest, songSave } from '@shared/services/syncuprocks/musician/Api';
