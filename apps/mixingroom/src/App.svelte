@@ -9,7 +9,7 @@
 <Header />
 
 {#if auth.isAuthenticated}
-	{#await import(`./lib/areas/${router.route.area}.svelte`)}
+	{#await import(`./Areas/${router.route.area}.svelte`)}
 		<!-- only show loading spinner if taking > 4 secs... -->
 	{:then module}
 		<svelte:component this={module.default} params={router.route.params} />
