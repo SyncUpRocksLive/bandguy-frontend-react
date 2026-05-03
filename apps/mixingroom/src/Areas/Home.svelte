@@ -1,12 +1,20 @@
 <script lang="ts">
+	import Band from "@/Assets/Band.svelte";
 	import { router } from "@/Router.svelte";
-	
 </script>
 
 <section id="center">
 	<div class="studio-controls">
-
 		<div class="control-grid">
+			<div class="control-item">
+				<div class="icon">
+					<Band size={100} color="white"/>
+				</div>
+				<h4>The Jam Room</h4>
+				<p>Practice, Gig, or Jam. One-click setup for the whole band.</p>
+				<button class="control-btn" onclick={() => window.location.href = "/jam"}>Go Live</button>
+			</div>
+			
 			<div class="control-item">
 				<div class="icon">📋</div>
 				<h4>Setlists</h4>
@@ -14,34 +22,39 @@
 					View and edit your setlists. Add or remove songs from your
 					performance lineup.
 				</p>
-				<button class="control-btn" onclick={() => router.navigate('Setlists')}>Manage Setlists</button>
+				<button
+					class="control-btn"
+					onclick={() => router.navigate("Setlists")}
+					>Manage Setlists</button
+				>
 			</div>
 
 			<div class="control-item">
 				<div class="icon">🎵</div>
 				<h4>Song Library</h4>
 				<p>
-					Browse and edit your complete song library. Songs can be added
-					to any setlist.
+					Browse and edit your complete song library. Songs can be
+					added to any setlist.
 				</p>
-				<button class="control-btn" onclick={() => router.navigate('SongLibrary')}>Browse Songs</button>
-			</div>
-
-			<div class="control-item">
-				<div class="icon">🎛️</div>
-				<h4>Mixing Console</h4>
-				<p>Coming soon: Advanced mixing and audio processing tools.</p>
-				<button class="control-btn" disabled>Coming Soon?</button>
+				<button
+					class="control-btn"
+					onclick={() => router.navigate("SongLibrary")}
+					>Browse Songs</button
+				>
 			</div>
 
 			<div class="control-item">
 				<div class="icon">📋</div>
 				<h4>Notebook</h4>
 				<p>
-					Record and manage scratch notes... favorite songs, setlist ideas,
-					or just jot down thoughts for your next practice session.
+					Record and manage scratch notes... favorite songs, setlist
+					ideas, or just jot down thoughts for your next practice
+					session.
 				</p>
-				<button class="control-btn" onclick={() => router.navigate('Notes')}>Open Notes</button>
+				<button
+					class="control-btn"
+					onclick={() => router.navigate("Notes")}>Open Notes</button
+				>
 			</div>
 
 			<div class="control-item">
