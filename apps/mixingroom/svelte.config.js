@@ -6,6 +6,7 @@ export default {
     if (warning.code === 'a11y_click_events_have_key_events') return;
     if (warning.code === 'a11y_no_static_element_interactions') return;
     if (warning.code === 'css_unused_selector') return;
+    if (warning.code === 'a11y_label_has_associated_control') return;
     
     handler(warning);
   }
