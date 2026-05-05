@@ -1,18 +1,19 @@
-import { PeerOperationMode, SongPlayStatus } from '@/Types/Types';
+import { SongPlayStatus } from '@/Types/Types';
 import type { Song, Track } from '@shared/services/syncuprocks/musician/Types';
-import type { JamChannelDetail } from '@shared/services/syncuprocks/musician/JamChannels';
 import { writable } from 'svelte/store';
-import { CreateSongStore } from '@/Support/Stores/SongStore';
+import { CreateSongCache } from '@/Support/Caches/SongCache';
 import { LogInfo, LogVerbose } from '@shared/services/Logger';
 import { getFilesetDataByVersion } from '@shared/services/syncuprocks/musician/Api';
 import { lyricsParser } from '@shared/parsers/lyrics/LyricsFileParser';
 import type { Lyric } from '@shared/parsers/lyrics/Lyrics';
 
+/** Support types of track data */
 export type TrackData =
 	| { type: 'audio' | 'binary'; content: Blob }
 	| { type: 'lyrics'; content: Lyric }
 	| { type: 'none'; content: undefined };
 
+/** Used for loading the track data */
 export interface TrackState {
 	id: number;
 	loading: boolean,
@@ -20,21 +21,34 @@ export interface TrackState {
 	data?: TrackData,
 }
 
+/** Work in progress - Tempo/Beat Mapping. to map beat markers to exact timestamps */
+export interface Marker {
+	timeMs: number;
+	beat: number;
+	type: string;
+}
+
+/** SyncStore handles all aspects of playback (regardless if single jam, or sync'd jam) */
 export interface SyncStoreItems {
-	peerMode: PeerOperationMode;
-	availableRemoteChannels?: JamChannelDetail[];
-	connectedChannelDetail?: JamChannelDetail;
+	/** Currently selected set */
 	currentSetId?: number;
+	/** Currently selected/playing song */
 	currentSongId?: number;
+	/** Current song (if any) */
 	currentSong?: Song,
+	/** Track Data */
 	currentSongTracks?: TrackState[];
+	/** Tempo/Beat Mapping */
+	currentSongMarkers?: Marker[];
+	/** Current millisecond time of select song */
 	playbackTimeMilliseconds: number;
+	/** If song is playing */
 	songPlayStatus: SongPlayStatus;
 }
 
-// This store handles current song status, modes, tracks, setlists, etc
+/** This store handles current song status, modes, tracks, setlists, etc */
 function createSyncStore() {
-	const songStore = CreateSongStore();
+	const songCache = CreateSongCache();
 
 	// Local mirror of the state
 	let state: SyncStoreItems;
@@ -43,13 +57,11 @@ function createSyncStore() {
 	let lastTick: number = 0;
 
 	const { subscribe, update } = writable<SyncStoreItems>({
-		peerMode: PeerOperationMode.None,
-		availableRemoteChannels: undefined,
-		connectedChannelDetail: undefined,
 		currentSetId: undefined,
 		currentSongId: undefined,
 		currentSong: undefined,
 		currentSongTracks: undefined,
+		currentSongMarkers: undefined,
 		playbackTimeMilliseconds: 0,
 		songPlayStatus: SongPlayStatus.Stop
 	});
@@ -85,12 +97,6 @@ function createSyncStore() {
 	function updateState(patch: Partial<SyncStoreItems>) {
 		update((state) => {
 			const newState = { ...state, ...patch };
-
-			// your existing logic
-			if (newState.peerMode === "Host") {
-				//BroadcastMessage({ type: "STATE_UPDATE", state: newState });
-			}
-
 			return newState;
 		});
 	}
@@ -137,8 +143,10 @@ function createSyncStore() {
 		}
 	}
 
-	// TODO: Take a filter method to filter non-useful tracks
-	async function ensureCurrentSongLoaded() {
+	/** Method to ensure currently selected song has tracks loading. Note, if tracks are loading while current song switches, new tracks will load
+	 * and any loading tracks will finish and be cached
+	 */
+	async function ensureCurrentSongLoaded(/** TODO: Add Filter */) {
 		if (!state.currentSong) {
 			LogInfo("No song loaded");
 			return;
@@ -177,8 +185,8 @@ function createSyncStore() {
 			LogVerbose(`Getting '${song.name}' - track '${track.name}'`);
 
 			// Already in db?
-			if (await songStore.exists(song.id, track.id, track.versionNumber!)) {
-				const songBlob = await songStore.get(song.id, track.id, track.versionNumber!);
+			if (await songCache.exists(song.id, track.id, track.versionNumber!)) {
+				const songBlob = await songCache.get(song.id, track.id, track.versionNumber!);
 
 				if (song !== state.currentSong) {
 					LogInfo("Song changed - skipping loading tracks")
@@ -208,7 +216,7 @@ function createSyncStore() {
 				LogVerbose(`Song '${song.name}' - track '${track.name}' - returned from web`);
 
 				// Let's go ahead and ensure we cache before checking current state
-				await songStore.put({
+				await songCache.put({
 					songId: song.id,
 					trackId: track.id,
 					version: track.versionNumber!,
@@ -241,4 +249,5 @@ function createSyncStore() {
 	};
 }
 
+/** Single SyncStore Instance */
 export const syncStore = createSyncStore();

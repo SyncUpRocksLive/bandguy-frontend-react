@@ -1,13 +1,14 @@
 <script lang="ts">
 	import { slide } from 'svelte/transition';
-	import { auth } from '../Auth.svelte';
-	import { router } from '../Router.svelte';
+	import { auth } from '../../Auth.svelte';
+	import { router } from '../../Router.svelte';
 	import { syncStore } from '@/Stores/SyncStore.svelte';
-	import { PeerOperationMode, SongPlayStatus } from '../Types/Types';
-	import Configuration from './NavModals/Configuration.svelte';
-	import HostModeStatus from './NavModals/HostModeStatus.svelte';
-	import GuestModeStatus from './NavModals/GuestModeStatus.svelte';
-	import UserProfile from './NavModals/UserProfile.svelte';
+	import { peerStore } from "@/Stores/PeerStore.svelte"
+	import { PeerOperationMode, SongPlayStatus } from '../../Types/Types';
+	import Configuration from './Configuration.svelte';
+	import HostModeStatus from './HostModeStatus.svelte';
+	import GuestModeStatus from './GuestModeStatus.svelte';
+	import UserProfile from './UserProfile.svelte';
 	import TopNavBadge from './TopNavBadge.svelte';
 
 	let isMenuOpen = $state(false); // Toggle state
@@ -36,13 +37,15 @@
 
 			<!-- Right Side Actions (Status/Profile always visible) -->
             <div class="actions">
-                {#if $syncStore.peerMode === PeerOperationMode.Host}
+                {#if $peerStore.peerMode === PeerOperationMode.Host}
                     <HostModeStatus />
-                {:else if $syncStore.peerMode === PeerOperationMode.Guest}
+                {:else if $peerStore.peerMode === PeerOperationMode.Guest}
                     <GuestModeStatus />
                 {/if}
+
                 <Configuration />
-                <UserProfile />
+                
+				<UserProfile />
             </div>
 		</div>
 

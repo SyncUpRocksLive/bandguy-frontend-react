@@ -1,33 +1,40 @@
 import { writable } from "svelte/store";
+import { PeerOperationMode } from '@/Types/Types';
+import type { JamChannelDetail } from '@shared/services/syncuprocks/musician/JamChannels';
 
-// Peering state
-// function createPeerStore () {
-// 	const { subscribe, update } = writable<SyncStoreItems>({
-// 		peerMode: PeerOperationMode.Solo,
-// 		availableRemoteChannels: undefined,
-// 		connectedChannelDetail: undefined,
-// 		currentSetId: undefined,
-// 		currentSongId: undefined,
-// 		songPlayStatus: SongPlayStatus.Stop
-// 	});
+export interface PeerStoreItems {
+	/** Current connection mode */
+	peerMode: PeerOperationMode;
+	availableRemoteChannels?: JamChannelDetail[];
+	connectedChannelDetail?: JamChannelDetail;
+}
 
-// 	function updateState(patch: Partial<SyncStoreItems>) {
-// 		update((state) => {
-// 			const newState = { ...state, ...patch };
+/** Peer Store - managing host/guest connections based on peer mode */
+function createPeerStore () {
+	const { subscribe, update } = writable<PeerStoreItems>({
+		peerMode: PeerOperationMode.None,
+		availableRemoteChannels: undefined,
+		connectedChannelDetail: undefined
+	});
 
-// 			// your existing logic
-// 			if (newState.peerMode === "Host") {
-// 				//BroadcastMessage({ type: "STATE_UPDATE", state: newState });
-// 			}
+	function updateState(patch: Partial<PeerStoreItems>) {
+		update((state) => {
+			const newState = { ...state, ...patch };
 
-// 			return newState;
-// 		});
-// 	}
+			// your existing logic
+			//if (newState.peerMode === "Host") {
+			//	//BroadcastMessage({ type: "STATE_UPDATE", state: newState });
+			//}
 
-// 	return {
-// 		subscribe,
-// 		updateState
-// 	};
-// }
+			return newState;
+		});
+	}
 
-// export const peerStore = createPeerStore();
+	return {
+		subscribe,
+		updateState
+	};
+}
+
+/** Single PeerStore Instance */
+export const peerStore = createPeerStore();

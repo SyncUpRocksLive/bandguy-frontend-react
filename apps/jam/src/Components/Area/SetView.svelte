@@ -59,7 +59,7 @@
 			return;
 		}
 
-		let nextSong: Song = undefined; 
+		let nextSong: Song | undefined = undefined; 
 		if (!$syncStore.currentSong) {
 			nextSong = query.data.value.songs[0];
 		} else {
@@ -69,6 +69,7 @@
 			} else if (currentIndex + 1 >= query.data.value.songs.length) {
 				// Reach end, stop
 				pauseSong();
+				return;
 			} else {
 				nextSong = query.data.value.songs[currentIndex + 1];
 			}
@@ -90,6 +91,7 @@
 			currentSetId: undefined,
 			currentSongId: undefined,
 			currentSong: undefined,
+			currentSongMarkers: undefined,
 			playbackTimeMilliseconds: 0,
 			songPlayStatus: SongPlayStatus.Stop
 		});
@@ -116,7 +118,7 @@
 		<div>Loading set...</div>
 	{:else if errorMessage}
 		<div>Error: {errorMessage}</div>
-	{:else if query.data}
+	{:else if query.data && query.data.ok}
 		<div class="set-container">
 			<!-- Sidebar with controls and song list -->
 			<div class="sidebar">
@@ -167,10 +169,10 @@
 			<div class="main-content">
 				{#if $syncStore.currentSongId}
 					<SongView
-						song={$syncStore.currentSong}
+						song={$syncStore.currentSong!}
 					/>
 				{:else}
-					<div class="no-song">Select a song to begin - g</div>
+					<div class="no-song">Select a song to begin</div>
 				{/if}
 			</div>
 		</div>
@@ -277,7 +279,7 @@
 
 	.main-content {
 		flex: 1;
-		background: rgba(255, 255, 255, 0.1);
+		background: rgba(0, 0, 0, 0.8);
 		display: flex;
 		flex-direction: column;
 	}

@@ -1,70 +1,65 @@
 <script lang="ts">
 	import { createQuery } from '@tanstack/svelte-query';
+	import { auth } from '@/Auth.svelte';
 	import { appState } from '@/State.svelte';
 	import { JamChannels, type JamChannelDetail } from '@shared/services/syncuprocks/musician/JamChannels';
 
-	// let joinCode = $state('');
-	// let showJoinCodeInput = $state(false);
+	let joinCode = $state('');
+	let showJoinCodeInput = $state(false);
 
-	// // Query for available channels
-	// const channelsQuery = createQuery({
-	// 	queryKey: ['channel.list'],
-	// 	queryFn: async () => {
-	// 		const allChannels = await JamChannels.getChannelList();
+	// Query for available channels
+	const channelsQuery = createQuery(() => ({
+		queryKey: ['channel.list'],
+		queryFn: async () => {
+			// TODO: Refactor this to use same type of response as Api
+			const allChannels = await JamChannels.getChannelList();
 
-	// 		// Ignore our own channels
-	// 		const otherChannels = allChannels
-	// 			.filter((k) => k.hostUser !== appState.store.user?.userId)
-	// 			.sort((a, b) => a.timestamp - b.timestamp);
+			// Ignore our own channels
+			const otherChannels = allChannels
+				.filter((k) => k.hostUser !== auth.user?.userId)
+				.sort((a, b) => a.timestamp - b.timestamp);
 
-	// 		return otherChannels;
-	// 	},
-	// 	refetchInterval: 2000,
-	// 	refetchOnMount: false,
-	// 	refetchOnWindowFocus: false,
-	// 	enabled: !!appState.store.user,
-	// });
+			return otherChannels;
+		},
+		refetchInterval: 2000,
+		refetchOnMount: false,
+		refetchOnWindowFocus: false,
+		enabled: !!auth.user,
+	}));
 
-	// // Use the channels directly
-	// let channelData = $state<JamChannelDetail[]>([]);
+	function joinChannel(channel: JamChannelDetail) {
+		console.log(`Joining channel: ${channel.friendlyName}`);
+		// TODO: Implement join channel logic
+		// appState.updateStore({
+		// 	connectedChannelDetail: channel,
+		// 	peerMode: 'Guest' as any
+		// });
+	}
 
-	// $effect(() => {
-	// 	channelData = $channelsQuery.data ?? [];
-	// });
-
-	// function joinChannel(channel: JamChannelDetail) {
-	// 	console.log(`Joining channel: ${channel.friendlyName}`);
-	// 	// TODO: Implement join channel logic
-	// 	appState.updateStore({
-	// 		connectedChannelDetail: channel,
-	// 		peerMode: 'Guest' as any
-	// 	});
-	// }
-
-	// function joinWithCode() {
-	// 	if (!joinCode.trim()) return;
-	// 	console.log(`Joining with code: ${joinCode}`);
-	// 	// TODO: Implement join by code logic
-	// 	joinCode = '';
-	// 	showJoinCodeInput = false;
-	// }
+	function joinWithCode() {
+		if (!joinCode.trim()) return;
+		console.log(`Joining with code: ${joinCode}`);
+		// TODO: Implement join by code logic
+		joinCode = '';
+		showJoinCodeInput = false;
+	}
 </script>
 
 <div class="band-join-container">
 	<div class="band-header">
 		<p class="band-title">Band List</p>
 	</div>
-<!-- 
+
 	<div class="band-content">
-		{#if $channelsQuery.isPending}
+		{#if channelsQuery.isLoading}
 			<p class="status-text">Loading available jam rooms...</p>
-		{:else if $channelsQuery.isError}
+		{:else if channelsQuery.isError}
 			<p class="error-text">Error loading jam rooms</p>
-		{:else if channelData.length === 0}
+		{:else if channelsQuery.data && channelsQuery.data.length === 0}
 			<p class="status-text">No jam rooms available</p>
 		{:else}
 			<ul class="channel-list">
-				{#each channelData as channel (channel.identifier)}
+				{#each channelsQuery.data as channel (channel.identifier)}
 					<li class="channel-item">
 						<button 
 							class="join-button"
@@ -108,11 +103,11 @@
 				</button>
 			</div>
 		{/if}
-	</div> -->
+	</div>
 </div>
 
 <style>
-	/* .band-join-container {
+	.band-join-container {
 		display: flex;
 		flex-direction: column;
 		height: 100%;
@@ -258,5 +253,5 @@
 
 	.code-submit:hover {
 		background: #218838;
-	} */
+	}
 </style>

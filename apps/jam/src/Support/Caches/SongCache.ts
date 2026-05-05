@@ -11,7 +11,7 @@ export interface SongBlob {
 	data: Blob;
 }
 
-export interface ISongStore {
+export interface ISongCache {
 	// Does not need to be called explicitly.
 	initialize:() => Promise<undefined>;
 	exists:(songId: number, trackId: number, version: number) => Promise<boolean>;
@@ -26,7 +26,7 @@ interface SongStoreDatabase {
 
 const _songStoreCache: SongStoreDatabase = {};
 
-export function CreateSongStore():ISongStore {
+export function CreateSongCache():ISongCache {
 	const initialize = (): Promise<undefined> => {
 		return new Promise<undefined>((resolve, reject) => {
 			// Already open?
@@ -122,6 +122,7 @@ export function CreateSongStore():ISongStore {
 				// TODO: Loop through keys:
 				// 	where multiple versions, prune old versions of songs
 				//  remove songs not accessed in last 30 days
+				// We need to add a second table (songMetadata - and write last accessed time to that table everytime song get called)
 			});
 		});
 	}

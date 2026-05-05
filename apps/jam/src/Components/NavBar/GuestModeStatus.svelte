@@ -1,70 +1,68 @@
 <script lang="ts">
-	//import { appState } from '../../State.svelte';
-	//import { LogInfo } from '@shared/services/Logger';
-	//import { broadcastMessage } from '../../Support/Services/MessageBus';
-	//import { MessageBusActionType } from '../../Types/MessageBus';
+	import { peerStore } from '@/Stores/PeerStore.svelte';
 
 	let show = $state(false);
 
-	// function bootFromBand(user: any) {
-	// 	LogInfo(`Kicking User:Instance (${user.username} out of band!)`);
-	// 	broadcastMessage({
-	// 		data: {
-	// 			type: MessageBusActionType.KICKOUT,
-	// 			userId: user.userId,
-	// 			instance: ''
-	// 		}
-	// 	});
-	// 	setShow(false);
-	// }
+	function leaveChannel() {
+		setShow(false);
 
-	// function setShow(value: boolean) {
-	// 	show = value;
-	// }
+		// TODO: Implement leave channel logic
+		// appState.updateStore({
+		// 	connectedChannelDetail: undefined,
+		// 	connectedUsers: [],
+		// 	currentSetId: undefined
+		// });
+	}
+
+	function setShow(value: boolean) {
+		show = value;
+	}
 </script>
 
 <button
 	class="status-button"
 	onclick={() => setShow(!show)}
-	title="Host Status"
-	aria-label="Host status menu"
+	title="Guest Status"
+	aria-label="Guest status menu"
 >
-	🎸
+	🎤
 </button>
 
 {#if show}
-	TODO
-	<!-- <div class="status-overlay" onclick={() => setShow(false)} onkeydown={(e) => { if (e.key === 'Escape') setShow(false); }} role="dialog" aria-modal="true" tabindex="-1">
+	<div class="status-overlay" onclick={() => setShow(false)} onkeydown={(e) => { if (e.key === 'Escape') setShow(false); }} role="dialog" aria-modal="true" tabindex="-1">
 		<div class="status-popover" onclick={(e) => e.stopPropagation()}>
 			<div class="status-header">
-				<h4>Band Leader {appState.store.user?.displayName}</h4>
+				<h4>Band Members TODO</h4>
 				<button onclick={() => setShow(false)} aria-label="Close">&times;</button>
 			</div>
 			<div class="status-body">
-				<div class="bandmates-section">
-					<strong>Bandmates:</strong>
-					{#if appState.store.connectedUsers.length > 0}
-						<ul class="bandmates-list">
+				<!-- {#if appState.store.connectedUsers.length > 0}
+					<div class="band-section">
+						<strong>Band:</strong>
+						<ul class="band-list">
 							{#each appState.store.connectedUsers as user (user.userId)}
-								<li class="bandmate-item">
+								<li class="band-item">
 									{user.username} ({user.role})
-									<button
-										class="kick-button"
-										onclick={() => bootFromBand(user)}
-										aria-label="Kick {user.username} out of band"
-									>
-										Kick out
-									</button>
+									{#if user.isBandLeader}
+										<span class="leader-badge">Leader</span>
+									{/if}
 								</li>
 							{/each}
 						</ul>
-					{:else}
-						<p>No bandmates connected</p>
-					{/if}
-				</div>
+						<button
+							class="leave-button"
+							onclick={leaveChannel}
+							aria-label="Leave band"
+						>
+							Leave Band
+						</button>
+					</div>
+				{:else}
+					<p>Not Connected</p>
+				{/if} -->
 			</div>
 		</div>
-	</div> -->
+	</div>
 {/if}
 
 <style>
@@ -142,17 +140,17 @@
 		padding: 1rem;
 	}
 
-	.bandmates-section {
+	.band-section {
 		margin-bottom: 1rem;
 	}
 
-	.bandmates-list {
+	.band-list {
 		list-style: none;
 		padding: 0;
-		margin: 0.5rem 0 0 0;
+		margin: 0.5rem 0 1rem 0;
 	}
 
-	.bandmate-item {
+	.band-item {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
@@ -160,22 +158,32 @@
 		border-bottom: 1px solid #eee;
 	}
 
-	.bandmate-item:last-child {
+	.band-item:last-child {
 		border-bottom: none;
 	}
 
-	.kick-button {
+	.leader-badge {
+		background-color: #ffc107;
+		color: #000;
+		padding: 0.125rem 0.25rem;
+		border-radius: 0.25rem;
+		font-size: 0.75rem;
+		font-weight: bold;
+	}
+
+	.leave-button {
 		background-color: #dc3545;
 		color: white;
 		border: none;
-		padding: 0.25rem 0.5rem;
+		padding: 0.5rem 1rem;
 		border-radius: 0.25rem;
 		cursor: pointer;
 		font-size: 0.875rem;
 		transition: background-color 0.2s;
+		width: 100%;
 	}
 
-	.kick-button:hover {
+	.leave-button:hover {
 		background-color: #c82333;
 	}
 </style>

@@ -3,6 +3,7 @@
 	import { router } from '@/Router.svelte';
 	import { auth } from '@/Auth.svelte';
 	import { syncStore } from "@/Stores/SyncStore.svelte"
+	import { peerStore } from "@/Stores/PeerStore.svelte"
 	import { Log } from '@shared/services/Logger';
 	import { getSetsOverview } from '@shared/services/syncuprocks/musician/Api';
 	import type { SetOverview } from '@shared/services/syncuprocks/musician/Types';
@@ -22,10 +23,24 @@
 	}));
 
 	function playSet(set: SetOverview) {
-		const route = $syncStore.peerMode === PeerOperationMode.Host ? 'HostSetView' : 'SoloSetView';
+		const route = $peerStore.peerMode === PeerOperationMode.Host ? 'HostSetView' : 'SoloSetView';
 		Log('verbose', `Starting set=${set.name} route=${route}`);
 		router.navigate(route, [set.id.toString()]);
 	}
+
+	const errorMessage = $derived.by(() => {
+		if (!query.isLoading) {
+			if (query.isError) {
+				return query.error.message;
+			} else if (!query.data) {
+				return "No Data Loaded";
+			} else if (query.data.ok === false) {
+				return query.data.error ?? "Unknown Error";
+			}
+		}
+	
+		return undefined;
+	});
 
 </script>
 
@@ -37,9 +52,9 @@
 	<div style="flex: 1; display: flex; flex-direction: row; background: rgba(0,0,0,.9); padding: 10px; color: white; overflow-y: auto;">
 		{#if query.isLoading}
 			<div>Loading...</div>
-		{:else if !query.data.ok}
-			<div>Error... {query.data?.error.message ?? ""}</div>
-		{:else if query.data}
+		{:else if errorMessage}
+			<div>Error: {errorMessage}</div>
+		{:else if query.data && query.data.ok}
 			{#each query.data.value as set (set.id)}
 				<div style="width: 200px; height: 100px; margin: 4px;">
 					<button

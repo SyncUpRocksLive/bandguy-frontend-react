@@ -1,67 +1,69 @@
 <script lang="ts">
+	import { LogInfo } from '@shared/services/Logger';
+	import { peerStore } from '@/Stores/PeerStore.svelte';
+	//import { broadcastMessage } from '../../Support/Services/MessageBus';
+	//import { MessageBusActionType } from '../../Types/MessageBus';
+
 	let show = $state(false);
 
-	function leaveChannel() {
-		setShow(false);
-
-		// TODO: Implement leave channel logic
-		// appState.updateStore({
-		// 	connectedChannelDetail: undefined,
-		// 	connectedUsers: [],
-		// 	currentSetId: undefined
+	function bootFromBand(user: any) {
+		LogInfo(`Kicking User:Instance (${user.username} out of band!)`);
+		// broadcastMessage({
+		// 	data: {
+		// 		type: MessageBusActionType.KICKOUT,
+		// 		userId: user.userId,
+		// 		instance: ''
+		// 	}
 		// });
+		setShow(false);
 	}
 
 	function setShow(value: boolean) {
-		show = value;
+	 	show = value;
 	}
 </script>
 
 <button
 	class="status-button"
 	onclick={() => setShow(!show)}
-	title="Guest Status"
-	aria-label="Guest status menu"
+	title="Host Status"
+	aria-label="Host status menu"
 >
-	🎤
+	🎸
 </button>
 
 {#if show}
-	TODO
-	<!-- <div class="status-overlay" onclick={() => setShow(false)} onkeydown={(e) => { if (e.key === 'Escape') setShow(false); }} role="dialog" aria-modal="true" tabindex="-1">
+	<div class="status-overlay" onclick={() => setShow(false)} onkeydown={(e) => { if (e.key === 'Escape') setShow(false); }} role="dialog" aria-modal="true" tabindex="-1">
 		<div class="status-popover" onclick={(e) => e.stopPropagation()}>
 			<div class="status-header">
-				<h4>Band Member {appState.store.user?.displayName}</h4>
+				<h4>Band Leader(s) TODO</h4>
 				<button onclick={() => setShow(false)} aria-label="Close">&times;</button>
 			</div>
 			<div class="status-body">
-				{#if appState.store.connectedUsers.length > 0}
-					<div class="band-section">
-						<strong>Band:</strong>
-						<ul class="band-list">
+				<div class="bandmates-section">
+					<strong>Bandmates:</strong>
+					<!-- {#if appState.store.connectedUsers.length > 0}
+						<ul class="bandmates-list">
 							{#each appState.store.connectedUsers as user (user.userId)}
-								<li class="band-item">
+								<li class="bandmate-item">
 									{user.username} ({user.role})
-									{#if user.isBandLeader}
-										<span class="leader-badge">Leader</span>
-									{/if}
+									<button
+										class="kick-button"
+										onclick={() => bootFromBand(user)}
+										aria-label="Kick {user.username} out of band"
+									>
+										Kick out
+									</button>
 								</li>
 							{/each}
 						</ul>
-						<button
-							class="leave-button"
-							onclick={leaveChannel}
-							aria-label="Leave band"
-						>
-							Leave Band
-						</button>
-					</div>
-				{:else}
-					<p>Not Connected</p>
-				{/if}
+					{:else}
+						<p>No bandmates connected</p>
+					{/if} -->
+				</div>
 			</div>
 		</div>
-	</div> -->
+	</div>
 {/if}
 
 <style>
@@ -139,17 +141,17 @@
 		padding: 1rem;
 	}
 
-	.band-section {
+	.bandmates-section {
 		margin-bottom: 1rem;
 	}
 
-	.band-list {
+	.bandmates-list {
 		list-style: none;
 		padding: 0;
-		margin: 0.5rem 0 1rem 0;
+		margin: 0.5rem 0 0 0;
 	}
 
-	.band-item {
+	.bandmate-item {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
@@ -157,32 +159,22 @@
 		border-bottom: 1px solid #eee;
 	}
 
-	.band-item:last-child {
+	.bandmate-item:last-child {
 		border-bottom: none;
 	}
 
-	.leader-badge {
-		background-color: #ffc107;
-		color: #000;
-		padding: 0.125rem 0.25rem;
-		border-radius: 0.25rem;
-		font-size: 0.75rem;
-		font-weight: bold;
-	}
-
-	.leave-button {
+	.kick-button {
 		background-color: #dc3545;
 		color: white;
 		border: none;
-		padding: 0.5rem 1rem;
+		padding: 0.25rem 0.5rem;
 		border-radius: 0.25rem;
 		cursor: pointer;
 		font-size: 0.875rem;
 		transition: background-color 0.2s;
-		width: 100%;
 	}
 
-	.leave-button:hover {
+	.kick-button:hover {
 		background-color: #c82333;
 	}
 </style>

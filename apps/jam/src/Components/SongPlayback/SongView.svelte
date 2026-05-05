@@ -4,6 +4,7 @@
 	import { SongPlayStatus } from "../../Types/Types";
 	import type { Song } from "@shared/services/syncuprocks/musician/Types";
 	import BasicLyricViewer from "./BasicLyricViewer.svelte";
+	import Metronome from "./Metronome.svelte";
 
 	interface Props {
 		song: Song;
@@ -71,6 +72,8 @@
 				{/if}
 			</div>
 		{/each}
+
+		<!-- <Metronome mode='tablet' /> -->
 	{/if}
 </div>
 

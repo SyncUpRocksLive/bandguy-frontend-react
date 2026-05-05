@@ -1,29 +1,18 @@
 <script lang="ts">
-	import { appState } from '../../State.svelte';
-	import { PeerOperationMode } from '../../Types/Types';
-	import BandJoin from '../BandJoin.svelte';
+	import { peerStore } from '@/Stores/PeerStore.svelte';
+	import { PeerOperationMode } from '@/Types/Types';
+	import JamJoin from '@/Components/Peer/JamJoin.svelte';
 	import SetView from './SetView.svelte';
 
-	// Set peer mode to Guest when this component mounts
-	$effect(() => {
-		if (appState.store.peerMode !== PeerOperationMode.Guest) {
-			appState.setPeerMode(PeerOperationMode.Guest);
-		}
-	});
-
-	// Check if connected
 	let isConnected = $state(false);
-
-	$effect(() => {
-		isConnected = !!appState.store.currentSetId;
-	});
 </script>
 
 <div class="guest-container">
 	{#if !isConnected}
-		<BandJoin />
+		<JamJoin />
 	{:else}
-		<SetView mode="guest" setId={appState.store.currentSetId} />
+		<!-- <SetView mode="guest" setId={appState.store.currentSetId} /> -->
+		 <p>TODO - SetView</p>
 	{/if}
 </div>
 

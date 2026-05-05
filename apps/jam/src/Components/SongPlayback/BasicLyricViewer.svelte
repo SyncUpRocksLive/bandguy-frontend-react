@@ -142,7 +142,7 @@
 		align-items: center;
 		justify-content: center;
 		height: 100%;
-		background: rgba(0, 0, 0, 0.8);
+		background: rgba(0, 0, 0, 0);
 		color: white;
 		text-align: center;
 		padding: 2rem;

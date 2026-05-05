@@ -7,8 +7,8 @@
 	import SetList from "./Components/Area/SetList.svelte";
 	import SetView from "./Components/Area/SetView.svelte";
 	import Guest from "./Components/Area/Guest.svelte";
-	import TopNavBar from "./Components/TopNavBar.svelte";
-	import { syncStore } from "./Stores/SyncStore.svelte"
+	import TopNavBar from "./Components/NavBar/TopNavBar.svelte";
+	import { peerStore } from "./Stores/PeerStore.svelte"
 	import { queryClient } from './QueryClient';
 	import { PeerOperationMode } from './Types/Types';
 	import { onMount } from 'svelte';
@@ -21,11 +21,11 @@
 	$effect(() => {
 
 		if (router.route.area.startsWith("Host")) {
-			syncStore.updateState({peerMode: PeerOperationMode.Host});
+			peerStore.updateState({peerMode: PeerOperationMode.Host});
 		} else if (router.route.area.startsWith("Solo")) {
-			syncStore.updateState({peerMode: PeerOperationMode.Solo});
+			peerStore.updateState({peerMode: PeerOperationMode.Solo});
 		} else {
-			syncStore.updateState({peerMode: PeerOperationMode.None});
+			peerStore.updateState({peerMode: PeerOperationMode.None});
 		}
 	});
 
