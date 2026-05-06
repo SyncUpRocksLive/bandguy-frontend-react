@@ -8,6 +8,7 @@
 	import { getSetsOverview } from '@shared/services/syncuprocks/musician/Api';
 	import type { SetOverview } from '@shared/services/syncuprocks/musician/Types';
 	import { PeerOperationMode } from '@/Types/Types';
+	import CreateJam from '../JamSessions/CreateJam.svelte';
 
 	let query = createQuery(() => ({
 		queryKey: ['my.setlist', auth.user?.userId ?? 'none'],
@@ -42,30 +43,39 @@
 		return undefined;
 	});
 
+	const createJamChannel = $derived.by(() => {
+		if ($peerStore.peerMode === PeerOperationMode.Host && !$peerStore.connectedChannelDetail) {
+			return true;
+		}
+
+		return false;
+	});
+
 </script>
 
 <div style="flex: 1; display: flex; flex-direction: column; margin: 1px; padding: 5px; overflow-y: auto;">
-	<div style="background: rgba(255,255,255,.7); padding: 0px; justify-content: center; align-items: center;">
-		<p style="font-weight: bold; margin: 0px; padding: 2px;">Set List</p>
-	</div>
 
 	<div style="flex: 1; display: flex; flex-direction: row; background: rgba(0,0,0,.9); padding: 10px; color: white; overflow-y: auto;">
-		{#if query.isLoading}
-			<div>Loading...</div>
-		{:else if errorMessage}
-			<div>Error: {errorMessage}</div>
-		{:else if query.data && query.data.ok}
-			{#each query.data.value as set (set.id)}
-				<div style="width: 200px; height: 100px; margin: 4px;">
-					<button
-						class="btn btn-dark"
-						style="padding: 2px 10px;"
-						onclick={() => playSet(set)}
-					>
-						▶ {set.name} : {set.songs.length} songs 00:00:00 hrs
-					</button>
-				</div>
-			{/each}
+		{#if createJamChannel}
+			<CreateJam />
+		{:else}
+			{#if query.isLoading}
+				<div>Loading...</div>
+			{:else if errorMessage}
+				<div>Error: {errorMessage}</div>
+			{:else if query.data && query.data.ok}
+				{#each query.data.value as set (set.id)}
+					<div style="width: 200px; height: 100px; margin: 4px;">
+						<button
+							class="btn btn-dark"
+							style="padding: 2px 10px;"
+							onclick={() => playSet(set)}
+						>
+							▶ {set.name} : {set.songs.length} songs 00:00:00 hrs
+						</button>
+					</div>
+				{/each}
+			{/if}
 		{/if}
 	</div>
 </div>

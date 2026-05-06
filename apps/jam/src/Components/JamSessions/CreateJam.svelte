@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { createQuery } from '@tanstack/svelte-query';
 	import { auth } from '@/Auth.svelte';
-	import { appState } from '@/State.svelte';
 	import { JamChannels, type JamChannelDetail } from '@shared/services/syncuprocks/musician/JamChannels';
 
 	let joinCode = $state('');
@@ -47,7 +46,7 @@
 
 <div class="band-join-container">
 	<div class="band-header">
-		<p class="band-title">Band List</p>
+		<p class="band-title">Channel Creation</p>
 	</div>
 
 	<div class="band-content">
@@ -79,10 +78,6 @@
 				onclick={() => showJoinCodeInput = !showJoinCodeInput}
 			>
 				{showJoinCodeInput ? '✕' : '→'} Enter Code
-			</button>
-
-			<button class="option-button" disabled>
-				→ Scan QR
 			</button>
 		</div>
 

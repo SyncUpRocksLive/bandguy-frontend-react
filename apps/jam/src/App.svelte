@@ -13,17 +13,23 @@
 	import { PeerOperationMode } from './Types/Types';
 	import { onMount } from 'svelte';
 	import { appState } from './State.svelte';
+	import { orchestrator } from './Support/Services/SyncUpOrchestrator';
 
 	onMount(async () => {
     	await appState.loadFromStorage();
+
+		// Add in the implementation dependencies
+		peerStore.linkOrchestrator(orchestrator);
   	});
 
 	$effect(() => {
-
-		if (router.route.area.startsWith("Host")) {
+		// Based on route params - ensure our peerStore reflects proper config
+		if (router.route.area.startsWith('Host')) {
 			peerStore.updateState({peerMode: PeerOperationMode.Host});
-		} else if (router.route.area.startsWith("Solo")) {
+		} else if (router.route.area.startsWith('Solo')) {
 			peerStore.updateState({peerMode: PeerOperationMode.Solo});
+		} else if (router.route.area.startsWith('Guest')) {
+			peerStore.updateState({peerMode: PeerOperationMode.Guest});
 		} else {
 			peerStore.updateState({peerMode: PeerOperationMode.None});
 		}

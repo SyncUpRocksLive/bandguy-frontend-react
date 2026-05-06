@@ -86,7 +86,7 @@
 	});
 
 	onDestroy(() => {
-    	console.log("Cleaning up downstream state...");
+		LogInfo('SetView::onDestroy: Cleaning up syncstore state')
 		syncStore.updateState({
 			currentSetId: undefined,
 			currentSongId: undefined,

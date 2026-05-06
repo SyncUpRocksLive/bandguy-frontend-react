@@ -1,4 +1,4 @@
-import { LogError } from "./Logger";
+import { LogError, LogInfo } from "./Logger";
 
 export enum SettingType {
 	YesNo = 'YesNo',
@@ -13,16 +13,16 @@ export type SettingValue =
 
 const ReadCurrentSettings = (category: string, settings: SettingValue[]): SettingValue[] => {
 	if (!window.localStorage) {
-		LogError('No Localstorage - returning default settings');
+		LogError('No Localstorage - returning default settings', 'Settings::ReadCurrentSettings()');
 		return settings;
 	}
 
 	const savedValuesString = window.localStorage.getItem(`setting.${category}`);
 	if (!savedValuesString) {
-		LogError(`Localstorage has no value set for setting.${category} - returning default settings`);
+		LogInfo(`Localstorage has no value set for setting.${category} - returning default settings`, 'Settings::ReadCurrentSettings()');
 		return settings;
 	}
-		
+
 	const savedValues = <SettingValue[]>JSON.parse(savedValuesString);
 
 	settings.forEach((s) => {

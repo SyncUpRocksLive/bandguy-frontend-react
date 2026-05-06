@@ -1,17 +1,22 @@
-import { type Client } from "@/Types/Client";
 
-export interface UserState {
-	displayName: string;
-	username: string;
-	userId: string;
+export interface ISyncUpOrchestrator {
+	
 }
 
-export interface ConnectedUser extends UserState {
-	isBandLeader: boolean;
-	role: string; // Not Set, Drummer, Guitar, Vocals, ...
-	client: Client;
+/**
+ * Player: ReadOnly view
+ * Leader: Ability to set current setlist/song/play position
+ */
+export enum PeerRole {
+	Player = 'Player',
+	Leader = 'Leader'
 }
 
+/** None: No current value set
+ * Solo: No Remote Connections Posible
+ * Host: Controlling master clock/and relaying any co-leader requests
+ * Guest: Depending on PeerRole, may be co-leader. But, does not control clock.
+ */
 export enum PeerOperationMode {
 	None = 'None',
 	Solo = 'Solo',

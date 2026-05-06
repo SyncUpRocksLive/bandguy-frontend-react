@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { peerStore } from '@/Stores/PeerStore.svelte';
 	import { PeerOperationMode } from '@/Types/Types';
-	import JamJoin from '@/Components/Peer/JamJoin.svelte';
+	import JamJoin from '@/Components/JamSessions/JamJoin.svelte';
 	import SetView from './SetView.svelte';
 
 	let isConnected = $state(false);

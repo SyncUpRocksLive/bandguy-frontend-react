@@ -1,38 +1,60 @@
 import { writable } from "svelte/store";
-import { PeerOperationMode } from '@/Types/Types';
+import { PeerOperationMode, PeerRole, type ISyncUpOrchestrator } from '@/Types/Types';
 import type { JamChannelDetail } from '@shared/services/syncuprocks/musician/JamChannels';
+import { LogError, LogInfo } from "@shared/services/Logger";
 
 export interface PeerStoreItems {
 	/** Current connection mode */
 	peerMode: PeerOperationMode;
-	availableRemoteChannels?: JamChannelDetail[];
-	connectedChannelDetail?: JamChannelDetail;
+	peerRole: PeerRole;
+	availableRemoteChannels: JamChannelDetail[] | null;
+	connectedChannelDetail: JamChannelDetail | null;
 }
 
 /** Peer Store - managing host/guest connections based on peer mode */
 function createPeerStore () {
+	let orchestrator: ISyncUpOrchestrator | null = null;
+	
 	const { subscribe, update } = writable<PeerStoreItems>({
 		peerMode: PeerOperationMode.None,
-		availableRemoteChannels: undefined,
-		connectedChannelDetail: undefined
+		peerRole: PeerRole.Player,
+		availableRemoteChannels: null,
+		connectedChannelDetail: null
 	});
 
 	function updateState(patch: Partial<PeerStoreItems>) {
 		update((state) => {
-			const newState = { ...state, ...patch };
-
-			// your existing logic
-			//if (newState.peerMode === "Host") {
-			//	//BroadcastMessage({ type: "STATE_UPDATE", state: newState });
-			//}
-
-			return newState;
+			return { ...state, ...patch };
 		});
 	}
 
 	return {
 		subscribe,
-		updateState
+		updateState,
+
+		/** Initiate Orchestrator - used for remote peer management connectivity in different peer modes. */
+		linkOrchestrator: (inst: ISyncUpOrchestrator) => { 
+			if (!inst) {
+				LogError('Unable to set NULL orchestrator!', 'PeerStore::linkOrchestrator()');
+				return;
+			}
+
+			LogInfo('Setting orchestrator', 'PeerStore::linkOrchestrator()')
+			orchestrator = inst; 
+		},
+        
+        /** TODO: Kick a specific user out of jam */
+        kickMember: () => {
+            // Validate locally if we are the Host Or Peer Role that allows kicking
+            //orchestrator?.sendCommand('KICK_MEMBER', { peerId });
+        },
+
+		/** TODO: Request update of our leader/peer roles status, current song/set/time, and peers */
+        requestStatus: () => {
+            //orchestrator?.sendCommand('REQ_LEADER', {});
+        },
+
+
 	};
 }
 

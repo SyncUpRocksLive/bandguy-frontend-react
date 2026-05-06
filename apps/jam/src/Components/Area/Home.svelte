@@ -17,14 +17,14 @@
 			class="btn btn-success btn-lg"
 			onclick={() => router.navigate('HostSets')}
 		>
-			Lead a band!
+			Start a Jam!
 		</button>
 
 		<button
 			class="btn btn-warning btn-lg"
 			onclick={() => router.navigate('Guest')}
 		>
-			Join a band!
+			Join a Jam!
 		</button>
 	</div>
 </div>
