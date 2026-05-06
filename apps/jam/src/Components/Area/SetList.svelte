@@ -9,6 +9,8 @@
 	import type { SetOverview } from '@shared/services/syncuprocks/musician/Types';
 	import { PeerOperationMode } from '@/Types/Types';
 	import CreateJam from '../JamSessions/CreateJam.svelte';
+	import { derived } from 'svelte/store';
+	import { msToHMS } from '@shared/display/DisplayHelpers';
 
 	let query = createQuery(() => ({
 		queryKey: ['my.setlist', auth.user?.userId ?? 'none'],
@@ -27,6 +29,16 @@
 		const route = $peerStore.peerMode === PeerOperationMode.Host ? 'HostSetView' : 'SoloSetView';
 		Log('verbose', `Starting set=${set.name} route=${route}`);
 		router.navigate(route, [set.id.toString()]);
+	}
+	
+	function getDuration(set: SetOverview) {
+		// FUTURE: Return duration as part of overview
+		const ms = set.songs.reduce((acc, song) => acc + (song.durationMs ?? 0), 0);
+		if (ms <= 0) {
+			return '';
+		}
+
+		return msToHMS(ms);
 	}
 
 	const errorMessage = $derived.by(() => {
@@ -51,14 +63,16 @@
 		return false;
 	});
 
+
 </script>
 
 <div style="flex: 1; display: flex; flex-direction: column; margin: 1px; padding: 5px; overflow-y: auto;">
 
-	<div style="flex: 1; display: flex; flex-direction: row; background: rgba(0,0,0,.9); padding: 10px; color: white; overflow-y: auto;">
+	<div style="flex: 1; display: flex; flex-direction: column; background: rgba(0,0,0,.5); padding: 10px; color: white; overflow-y: auto;">
 		{#if createJamChannel}
 			<CreateJam />
 		{:else}
+			<!-- TODO: Clean this style up -->
 			{#if query.isLoading}
 				<div>Loading...</div>
 			{:else if errorMessage}
@@ -66,12 +80,8 @@
 			{:else if query.data && query.data.ok}
 				{#each query.data.value as set (set.id)}
 					<div style="width: 200px; height: 100px; margin: 4px;">
-						<button
-							class="btn btn-dark"
-							style="padding: 2px 10px;"
-							onclick={() => playSet(set)}
-						>
-							▶ {set.name} : {set.songs.length} songs 00:00:00 hrs
+						<button class="btn btn-dark" onclick={() => playSet(set)}>
+							▶ {set.name} ({set.songs.length} songs) {getDuration(set)}
 						</button>
 					</div>
 				{/each}
@@ -85,7 +95,6 @@
 		display: inline-block;
 		font-weight: 400;
 		line-height: 1.5;
-		color: #212529;
 		text-align: center;
 		text-decoration: none;
 		vertical-align: middle;
@@ -95,15 +104,15 @@
 		user-select: none;
 		background-color: transparent;
 		border: 1px solid transparent;
-		padding: 0.375rem 0.75rem;
+		padding: .35rem .75rem;
 		font-size: 1rem;
-		border-radius: 0.25rem;
+		border-radius: 5px;
 		transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 	}
 
 	.btn-dark {
 		color: #fff;
-		background-color: #343a40;
+		background-color: #1f3040;
 		border-color: #343a40;
 	}
 

@@ -26,21 +26,8 @@
 		enabled: !!auth.user,
 	}));
 
-	function joinChannel(channel: JamChannelDetail) {
-		console.log(`Joining channel: ${channel.friendlyName}`);
-		// TODO: Implement join channel logic
-		// appState.updateStore({
-		// 	connectedChannelDetail: channel,
-		// 	peerMode: 'Guest' as any
-		// });
-	}
-
-	function joinWithCode() {
-		if (!joinCode.trim()) return;
-		console.log(`Joining with code: ${joinCode}`);
-		// TODO: Implement join by code logic
-		joinCode = '';
-		showJoinCodeInput = false;
+	function createChannel() {
+		// TODO
 	}
 </script>
 
@@ -62,7 +49,7 @@
 					<li class="channel-item">
 						<button 
 							class="join-button"
-							onclick={() => joinChannel(channel)}
+							onclick={() => createChannel()}
 							title={`Join ${channel.friendlyName}`}
 						>
 							Join Band: <strong>{channel.friendlyName}</strong>
@@ -88,12 +75,12 @@
 					placeholder="Enter join code"
 					bind:value={joinCode}
 					onkeydown={(e) => {
-						if (e.key === 'Enter') joinWithCode();
+						if (e.key === 'Enter') createChannel();
 						if (e.key === 'Escape') showJoinCodeInput = false;
 					}}
 					class="code-input"
 				/>
-				<button onclick={joinWithCode} class="code-submit">
+				<button onclick={createChannel} class="code-submit">
 					Join
 				</button>
 			</div>
