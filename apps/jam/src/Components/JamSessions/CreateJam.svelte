@@ -1,34 +1,44 @@
 <script lang="ts">
-	import { createQuery } from '@tanstack/svelte-query';
+	import { createMutation } from '@tanstack/svelte-query';
 	import { auth } from '@/Auth.svelte';
+	import { peerStore } from "@/Stores/PeerStore.svelte";
 	import { JamChannels, type JamChannelDetail } from '@shared/services/syncuprocks/musician/JamChannels';
+	import { LogError, LogInfo } from '@shared/services/Logger';
+	import { onMount } from 'svelte';
 
-	let joinCode = $state('');
-	let showJoinCodeInput = $state(false);
+	let joinCode = $state('1234');
+	let channelName = $state('');
 
-	// Query for available channels
-	const channelsQuery = createQuery(() => ({
-		queryKey: ['channel.list'],
-		queryFn: async () => {
-			// TODO: Refactor this to use same type of response as Api
-			const allChannels = await JamChannels.getChannelList();
-
-			// Ignore our own channels
-			const otherChannels = allChannels
-				.filter((k) => k.hostUser !== auth.user?.userId)
-				.sort((a, b) => a.timestamp - b.timestamp);
-
-			return otherChannels;
-		},
-		refetchInterval: 2000,
-		refetchOnMount: false,
-		refetchOnWindowFocus: false,
-		enabled: !!auth.user,
-	}));
+	const mutation = createMutation(() => ({
+        mutationFn: async (code: string) => {
+            return await JamChannels.createChannel({
+				hostUser: auth.user!.userId,
+				identifier: channelName,
+				friendlyName: channelName,
+				timestamp: Date.now()
+			});
+        },
+        onSuccess: (data) => {
+            LogInfo(`Channel Created: ${data}`, 'CreateJam');
+			peerStore.updateState({
+				connectedChannelDetail: data!
+			});
+        },
+        onError: (err) => {
+            LogError(`Failed to create channel: ${err}`, 'CreateJam');
+        }
+    }));
 
 	function createChannel() {
-		// TODO
+		if (!joinCode || !channelName || mutation.isPending) return;
+        
+		mutation.mutate(joinCode);
 	}
+
+	onMount(() => {
+		channelName = auth.user ? `${auth.user.username}'s Jam` : 'My Jam';
+	});
+
 </script>
 
 <div class="band-join-container">
@@ -37,58 +47,55 @@
 	</div>
 
 	<div class="band-content">
-		{#if channelsQuery.isLoading}
-			<p class="status-text">Loading available jam rooms...</p>
-		{:else if channelsQuery.isError}
-			<p class="error-text">Error loading jam rooms</p>
-		{:else if channelsQuery.data && channelsQuery.data.length === 0}
-			<p class="status-text">No jam rooms available</p>
-		{:else}
-			<ul class="channel-list">
-				{#each channelsQuery.data as channel (channel.identifier)}
-					<li class="channel-item">
-						<button 
-							class="join-button"
-							onclick={() => createChannel()}
-							title={`Join ${channel.friendlyName}`}
-						>
-							Join Band: <strong>{channel.friendlyName}</strong>
-						</button>
-					</li>
-				{/each}
-			</ul>
-		{/if}
-
-		<div class="join-options">
-			<button
-				class="option-button"
-				onclick={() => showJoinCodeInput = !showJoinCodeInput}
-			>
-				{showJoinCodeInput ? '✕' : '→'} Enter Code
+		<div class="code-input-section">
+			<input
+				type="text"
+				placeholder="Enter channel name"
+				bind:value={channelName}
+				onkeydown={(e) => {
+					if (e.key === 'Enter') createChannel();
+				}}
+				class="code-input"
+			/>
+			<input
+				type="text"
+				placeholder="Enter join code"
+				bind:value={joinCode}
+				onkeydown={(e) => {
+					if (e.key === 'Enter') createChannel();
+				}}
+				class="code-input"
+			/>
+			<button onclick={createChannel} class="code-submit">
+				{#if mutation.isPending}
+                    <span class="spinner"></span> 
+                {:else}
+                    Create Channel
+                {/if}
 			</button>
 		</div>
 
-		{#if showJoinCodeInput}
-			<div class="code-input-section">
-				<input
-					type="text"
-					placeholder="Enter join code"
-					bind:value={joinCode}
-					onkeydown={(e) => {
-						if (e.key === 'Enter') createChannel();
-						if (e.key === 'Escape') showJoinCodeInput = false;
-					}}
-					class="code-input"
-				/>
-				<button onclick={createChannel} class="code-submit">
-					Join
-				</button>
-			</div>
-		{/if}
+		{#if mutation.isError}
+            <p class="error-text">Error: {mutation.error.message}</p>
+        {/if}
 	</div>
 </div>
 
 <style>
+	.spinner {
+        display: inline-block;
+        width: 1rem;
+        height: 1rem;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
 	.band-join-container {
 		display: flex;
 		flex-direction: column;
@@ -120,79 +127,9 @@
 		gap: 1rem;
 	}
 
-	.status-text {
-		text-align: center;
-		color: #aaa;
-		font-style: italic;
-	}
-
 	.error-text {
 		text-align: center;
 		color: #f00;
-	}
-
-	.channel-list {
-		list-style: none;
-		padding: 0;
-		margin: 0;
-		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
-	}
-
-	.channel-item {
-		width: 100%;
-	}
-
-	.join-button {
-		width: 100%;
-		padding: 0.75rem;
-		background: #007bff;
-		color: white;
-		border: none;
-		border-radius: 0.25rem;
-		cursor: pointer;
-		font-size: 1rem;
-		transition: background 0.2s;
-	}
-
-	.join-button:hover {
-		background: #0056b3;
-	}
-
-	.join-button:active {
-		background: #003d82;
-	}
-
-	.join-options {
-		display: flex;
-		gap: 0.5rem;
-		flex-wrap: wrap;
-		margin-top: 1rem;
-		border-top: 1px solid rgba(255, 255, 255, 0.2);
-		padding-top: 1rem;
-	}
-
-	.option-button {
-		flex: 1;
-		min-width: 100px;
-		padding: 0.5rem;
-		background: rgba(255, 255, 255, 0.1);
-		color: white;
-		border: 1px solid rgba(255, 255, 255, 0.3);
-		border-radius: 0.25rem;
-		cursor: pointer;
-		font-size: 0.9rem;
-		transition: background 0.2s;
-	}
-
-	.option-button:hover:not(:disabled) {
-		background: rgba(255, 255, 255, 0.2);
-	}
-
-	.option-button:disabled {
-		opacity: 0.5;
-		cursor: not-allowed;
 	}
 
 	.code-input-section {

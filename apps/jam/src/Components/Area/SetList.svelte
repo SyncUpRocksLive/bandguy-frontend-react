@@ -2,15 +2,15 @@
 	import { createQuery } from '@tanstack/svelte-query';
 	import { router } from '@/Router.svelte';
 	import { auth } from '@/Auth.svelte';
-	import { syncStore } from "@/Stores/SyncStore.svelte"
 	import { peerStore } from "@/Stores/PeerStore.svelte"
-	import { Log } from '@shared/services/Logger';
+	import { Log, LogInfo } from '@shared/services/Logger';
 	import { getSetsOverview } from '@shared/services/syncuprocks/musician/Api';
 	import type { SetOverview } from '@shared/services/syncuprocks/musician/Types';
 	import { PeerOperationMode } from '@/Types/Types';
 	import CreateJam from '../JamSessions/CreateJam.svelte';
-	import { derived } from 'svelte/store';
+	import JamJoin from '../JamSessions/JamJoin.svelte';
 	import { msToHMS } from '@shared/display/DisplayHelpers';
+	import { onDestroy } from 'svelte';
 
 	let query = createQuery(() => ({
 		queryKey: ['my.setlist', auth.user?.userId ?? 'none'],
@@ -55,22 +55,22 @@
 		return undefined;
 	});
 
-	const createJamChannel = $derived.by(() => {
+	let JamSetupDialog = $derived.by(() => {
 		if ($peerStore.peerMode === PeerOperationMode.Host && !$peerStore.connectedChannelDetail) {
-			return true;
+			return CreateJam;
+		} else if ($peerStore.peerMode === PeerOperationMode.Guest && !$peerStore.connectedChannelDetail) {
+			return JamJoin;
 		}
 
-		return false;
+		return null;
 	});
-
 
 </script>
 
 <div class="main-div">
-
 	<div class="inner-div">
-		{#if createJamChannel}
-			<CreateJam />
+		{#if JamSetupDialog}
+			<JamSetupDialog />
 		{:else}
 			<!-- TODO: Clean this style up -->
 			{#if query.isLoading}

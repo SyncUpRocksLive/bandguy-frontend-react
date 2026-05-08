@@ -81,7 +81,6 @@
 
 	// Update state
 	$effect(() => {
-		// TODO: Move to onMount - also, set first song as selected after query loads
 		syncStore.updateState({currentSetId: setId})
 	});
 

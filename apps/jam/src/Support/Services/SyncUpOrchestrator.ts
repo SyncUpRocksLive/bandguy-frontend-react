@@ -51,7 +51,7 @@ class SyncUpOrchestrator implements ISyncUpOrchestrator {
 			return
 		}
 
-		peerStore.updateState({peerRole: peerRole, availableRemoteChannels: [], connectedChannelDetail: null});
+		peerStore.updateState({peerRole: peerRole, connectedChannelDetail: null});
     }
 
     private broadcastSync(state: SyncStoreItems) {

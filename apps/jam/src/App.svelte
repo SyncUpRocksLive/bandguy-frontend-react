@@ -6,7 +6,6 @@
 	import Home from "./Components/Area/Home.svelte";
 	import SetList from "./Components/Area/SetList.svelte";
 	import SetView from "./Components/Area/SetView.svelte";
-	import Guest from "./Components/Area/Guest.svelte";
 	import TopNavBar from "./Components/NavBar/TopNavBar.svelte";
 	import { peerStore } from "./Stores/PeerStore.svelte";
 	import { queryClient } from "./QueryClient";
@@ -52,7 +51,7 @@
 			{:else if router.route.area === "SoloSetView"}
 				<SetView setId={parseInt(router.route.params[0])} />
 			{:else if router.route.area === "Guest"}
-				<Guest />
+				<SetList />
 			{:else}
 				<p>Unknown route: {router.route.area}</p>
 				<button onclick={() => router.navigate("Home")}>Go Home</button>

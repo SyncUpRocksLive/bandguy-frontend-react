@@ -2,8 +2,10 @@
 	import { createQuery } from '@tanstack/svelte-query';
 	import { auth } from '@/Auth.svelte';
 	import { JamChannels, type JamChannelDetail } from '@shared/services/syncuprocks/musician/JamChannels';
+	import { LogInfo, LogObject } from '@shared/services/Logger';
+	import { peerStore } from '@/Stores/PeerStore.svelte';
 
-	let joinCode = $state('');
+	let joinCode = $state('1234');
 	let showJoinCodeInput = $state(false);
 
 	// Query for available channels
@@ -11,7 +13,9 @@
 		queryKey: ['channel.list'],
 		queryFn: async () => {
 			// TODO: Refactor this to use same type of response as Api
+			LogInfo('Fetching channel list...', 'JamJoin');
 			const allChannels = await JamChannels.getChannelList();
+			LogObject('info', 'JamJoin - Channel List', allChannels);
 
 			// Ignore our own channels
 			const otherChannels = allChannels
@@ -20,7 +24,7 @@
 
 			return otherChannels;
 		},
-		refetchInterval: 2000,
+		refetchInterval: 5000,
 		refetchOnMount: false,
 		refetchOnWindowFocus: false,
 		enabled: !!auth.user,
@@ -28,11 +32,9 @@
 
 	function joinChannel(channel: JamChannelDetail) {
 		console.log(`Joining channel: ${channel.friendlyName}`);
-		// TODO: Implement join channel logic
-		// appState.updateStore({
-		// 	connectedChannelDetail: channel,
-		// 	peerMode: 'Guest' as any
-		// });
+		peerStore.updateState({
+			connectedChannelDetail: channel
+		});
 	}
 
 	function joinWithCode() {
@@ -72,36 +74,21 @@
 			</ul>
 		{/if}
 
-		<div class="join-options">
-			<button
-				class="option-button"
-				onclick={() => showJoinCodeInput = !showJoinCodeInput}
-			>
-				{showJoinCodeInput ? '✕' : '→'} Enter Code
-			</button>
-
-			<button class="option-button" disabled>
-				→ Scan QR
+		<div class="code-input-section">
+			<input
+				type="text"
+				placeholder="Enter join code"
+				bind:value={joinCode}
+				onkeydown={(e) => {
+					if (e.key === 'Enter') joinWithCode();
+					if (e.key === 'Escape') showJoinCodeInput = false;
+				}}
+				class="code-input"
+			/>
+			<button onclick={joinWithCode} class="code-submit">
+				Join
 			</button>
 		</div>
-
-		{#if showJoinCodeInput}
-			<div class="code-input-section">
-				<input
-					type="text"
-					placeholder="Enter join code"
-					bind:value={joinCode}
-					onkeydown={(e) => {
-						if (e.key === 'Enter') joinWithCode();
-						if (e.key === 'Escape') showJoinCodeInput = false;
-					}}
-					class="code-input"
-				/>
-				<button onclick={joinWithCode} class="code-submit">
-					Join
-				</button>
-			</div>
-		{/if}
 	</div>
 </div>
 
@@ -179,37 +166,6 @@
 
 	.join-button:active {
 		background: #003d82;
-	}
-
-	.join-options {
-		display: flex;
-		gap: 0.5rem;
-		flex-wrap: wrap;
-		margin-top: 1rem;
-		border-top: 1px solid rgba(255, 255, 255, 0.2);
-		padding-top: 1rem;
-	}
-
-	.option-button {
-		flex: 1;
-		min-width: 100px;
-		padding: 0.5rem;
-		background: rgba(255, 255, 255, 0.1);
-		color: white;
-		border: 1px solid rgba(255, 255, 255, 0.3);
-		border-radius: 0.25rem;
-		cursor: pointer;
-		font-size: 0.9rem;
-		transition: background 0.2s;
-	}
-
-	.option-button:hover:not(:disabled) {
-		background: rgba(255, 255, 255, 0.2);
-	}
-
-	.option-button:disabled {
-		opacity: 0.5;
-		cursor: not-allowed;
 	}
 
 	.code-input-section {

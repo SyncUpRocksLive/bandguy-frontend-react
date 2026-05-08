@@ -7,7 +7,6 @@ export interface PeerStoreItems {
 	/** Current connection mode */
 	peerMode: PeerOperationMode;
 	peerRole: PeerRole;
-	availableRemoteChannels: JamChannelDetail[] | null;
 	connectedChannelDetail: JamChannelDetail | null;
 }
 
@@ -18,7 +17,6 @@ function createPeerStore () {
 	const { subscribe, update } = writable<PeerStoreItems>({
 		peerMode: PeerOperationMode.None,
 		peerRole: PeerRole.Player,
-		availableRemoteChannels: null,
 		connectedChannelDetail: null
 	});
 
