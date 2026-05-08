@@ -21,7 +21,13 @@
         onSuccess: (data) => {
             LogInfo(`Channel Created: ${data}`, 'CreateJam');
 			peerStore.updateState({
-				connectedChannelDetail: data!
+				peerChannelDetail: {
+					hostUser: data!.hostUser,
+					identifier: data!.identifier,
+					friendlyName: data!.friendlyName,
+					timestamp: data!.timestamp,
+					status: 'connected'
+				}
 			});
         },
         onError: (err) => {

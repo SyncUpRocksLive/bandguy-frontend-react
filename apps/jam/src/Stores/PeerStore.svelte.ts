@@ -3,11 +3,16 @@ import { PeerOperationMode, PeerRole, type ISyncUpOrchestrator } from '@/Types/T
 import type { JamChannelDetail } from '@shared/services/syncuprocks/musician/JamChannels';
 import { LogError, LogInfo } from "@shared/services/Logger";
 
+export interface JamChannelConnectionDetail extends JamChannelDetail {
+	/** Current link status */
+	status: 'connected' | 'pending' | 'disconnected';
+}
+
 export interface PeerStoreItems {
 	/** Current connection mode */
 	peerMode: PeerOperationMode;
 	peerRole: PeerRole;
-	connectedChannelDetail: JamChannelDetail | null;
+	peerChannelDetail: JamChannelConnectionDetail | null;
 }
 
 /** Peer Store - managing host/guest connections based on peer mode */
@@ -17,7 +22,7 @@ function createPeerStore () {
 	const { subscribe, update } = writable<PeerStoreItems>({
 		peerMode: PeerOperationMode.None,
 		peerRole: PeerRole.Player,
-		connectedChannelDetail: null
+		peerChannelDetail: null
 	});
 
 	function updateState(patch: Partial<PeerStoreItems>) {
@@ -51,8 +56,6 @@ function createPeerStore () {
         requestStatus: () => {
             //orchestrator?.sendCommand('REQ_LEADER', {});
         },
-
-
 	};
 }
 

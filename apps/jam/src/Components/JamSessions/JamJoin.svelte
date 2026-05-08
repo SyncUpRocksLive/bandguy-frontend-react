@@ -33,8 +33,13 @@
 	function joinChannel(channel: JamChannelDetail) {
 		console.log(`Joining channel: ${channel.friendlyName}`);
 		peerStore.updateState({
-			connectedChannelDetail: channel
-		});
+			peerChannelDetail: {
+			hostUser: channel.hostUser,
+			identifier: channel.identifier,
+			friendlyName: channel.friendlyName,
+			timestamp: channel.timestamp,
+			status: 'pending'
+		}});
 	}
 
 	function joinWithCode() {
@@ -66,6 +71,7 @@
 							class="join-button"
 							onclick={() => joinChannel(channel)}
 							title={`Join ${channel.friendlyName}`}
+							
 						>
 							Join Band: <strong>{channel.friendlyName}</strong>
 						</button>

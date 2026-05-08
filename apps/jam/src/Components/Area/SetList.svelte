@@ -3,14 +3,13 @@
 	import { router } from '@/Router.svelte';
 	import { auth } from '@/Auth.svelte';
 	import { peerStore } from "@/Stores/PeerStore.svelte"
-	import { Log, LogInfo } from '@shared/services/Logger';
+	import { Log } from '@shared/services/Logger';
 	import { getSetsOverview } from '@shared/services/syncuprocks/musician/Api';
 	import type { SetOverview } from '@shared/services/syncuprocks/musician/Types';
 	import { PeerOperationMode } from '@/Types/Types';
 	import CreateJam from '../JamSessions/CreateJam.svelte';
 	import JamJoin from '../JamSessions/JamJoin.svelte';
 	import { msToHMS } from '@shared/display/DisplayHelpers';
-	import { onDestroy } from 'svelte';
 
 	let query = createQuery(() => ({
 		queryKey: ['my.setlist', auth.user?.userId ?? 'none'],
@@ -56,9 +55,9 @@
 	});
 
 	let JamSetupDialog = $derived.by(() => {
-		if ($peerStore.peerMode === PeerOperationMode.Host && !$peerStore.connectedChannelDetail) {
+		if ($peerStore.peerMode === PeerOperationMode.Host && !$peerStore.peerChannelDetail) {
 			return CreateJam;
-		} else if ($peerStore.peerMode === PeerOperationMode.Guest && !$peerStore.connectedChannelDetail) {
+		} else if ($peerStore.peerMode === PeerOperationMode.Guest && !$peerStore.peerChannelDetail) {
 			return JamJoin;
 		}
 
