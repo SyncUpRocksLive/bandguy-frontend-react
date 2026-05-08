@@ -69,6 +69,7 @@
 		width: 100%;
 		display: flex;
 		flex-direction: column;
-		overflow: clip;
+		box-sizing: border-box;
+		padding: 0;
 	}
 </style>

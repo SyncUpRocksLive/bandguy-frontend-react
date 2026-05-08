@@ -60,6 +60,14 @@
 					router.linkTo('Home').onclick(e); 
 					closeMenu(); 
 				}}>JAM</a>
+
+				<!-- TODO: this will not work if page is reloaded on current page. Need to check current route -->
+				{#if $peerStore.peerMode !== PeerOperationMode.None}
+					<a href="#/" onclick={(e) => { 
+						router.back();
+						closeMenu(); 
+					}}>BACK</a>
+				{/if}
             </nav>
         {/if}
 	</header>

@@ -183,16 +183,25 @@
 
 <style>
 	.set-view {
-		position: relative;
-		height: 100vh;
+		/* background-color: rgba(0, 255, 255, 0.132);
+		width: 100%;
+		height: 100%;
 		display: flex;
-		flex-direction: column;
+		flex-direction: column; */
+		flex: 1;
+		display: flex; 
+		flex-direction: column; 
+		background-color: rgba(0, 255, 255, 0.132);
+		padding: 0; 
+		color: white; 
+		overflow: hidden !important; 
+		overscroll-behavior: none;
 	}
 
 	.set-container {
 		display: flex;
 		flex: 1;
-		height: calc(100vh - 60px); /* Account for navbar */
+		overflow-y: auto;
 	}
 
 	.sidebar {
@@ -201,6 +210,8 @@
 		display: flex;
 		flex-direction: column;
 		border-right: 1px solid rgba(255, 255, 255, 0.3);
+		overflow-y: auto;
+    	scrollbar-gutter: stable;
 	}
 
 	.controls {

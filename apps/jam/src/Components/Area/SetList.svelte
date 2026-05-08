@@ -66,9 +66,9 @@
 
 </script>
 
-<div style="flex: 1; display: flex; flex-direction: column; margin: 1px; padding: 5px; overflow-y: auto;">
+<div class="main-div">
 
-	<div style="flex: 1; display: flex; flex-direction: column; background: rgba(0,0,0,.5); padding: 10px; color: white; overflow-y: auto;">
+	<div class="inner-div">
 		{#if createJamChannel}
 			<CreateJam />
 		{:else}
@@ -91,6 +91,27 @@
 </div>
 
 <style>
+	.main-div {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		margin: 1px;
+		padding: 5px;
+		overflow-y: auto;
+		overflow: hidden !important; 
+		overscroll-behavior: none;
+	}
+
+	.inner-div {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		background: rgba(0,0,0,.5);
+		padding: 10px;
+		color: white;
+		overflow-y: auto;
+	}
+
 	.btn {
 		display: inline-block;
 		font-weight: 400;
