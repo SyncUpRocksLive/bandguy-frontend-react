@@ -65,6 +65,14 @@ class SyncUpOrchestrator implements ISyncUpOrchestrator {
         // };
         // this.dataChannel?.send(JSON.stringify(packet));
     }
+
+	sendCommand(cmd: string, payload: any): void {
+
+	}
+
+	disconnect(): void {
+		peerStore.updateState({peerRole: PeerRole.Leader, peerChannelDetail: null});
+	}
 }
 
 // Create the single instance

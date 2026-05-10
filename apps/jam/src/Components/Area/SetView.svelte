@@ -7,7 +7,6 @@
 	import SongView from '@/Components/SongPlayback/SongView.svelte';
 	import { getSetComplete } from '@shared/services/syncuprocks/musician/Api';
 	import type { Song } from '@shared/services/syncuprocks/musician/Types';
-	import { queryClient } from '@/QueryClient';
 
 	interface Props {
 		setId: number;

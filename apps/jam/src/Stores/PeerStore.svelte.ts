@@ -52,6 +52,13 @@ function createPeerStore () {
             //orchestrator?.sendCommand('KICK_MEMBER', { peerId });
         },
 
+        /** TODO: Leave the current jam session */
+        leaveJam: () => {
+            // Validate locally if we are the Host Or Peer Role that allows leaving
+            orchestrator?.sendCommand('LEAVE_JAM', { });
+			orchestrator?.disconnect();
+        },
+
 		/** TODO: Request update of our leader/peer roles status, current song/set/time, and peers */
         requestStatus: () => {
             //orchestrator?.sendCommand('REQ_LEADER', {});

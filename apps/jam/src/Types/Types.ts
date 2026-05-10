@@ -1,6 +1,7 @@
 
 export interface ISyncUpOrchestrator {
-	
+	sendCommand(cmd: string, payload: any): void;
+	disconnect(): void;
 }
 
 /**

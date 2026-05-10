@@ -37,11 +37,11 @@
 
 			<!-- Right Side Actions (Status/Profile always visible) -->
             <div class="actions">
-                {#if ($peerStore.peerMode !== PeerOperationMode.None && $peerStore.peerMode !== PeerOperationMode.Solo) && $peerStore.peerRole === PeerRole.Leader}
+                {#if $peerStore.peerChannelDetail && ($peerStore.peerMode === PeerOperationMode.Guest || $peerStore.peerMode === PeerOperationMode.Host) && $peerStore.peerRole === PeerRole.Leader}
                     <HostModeStatus />
 				{/if}
 
-                {#if $peerStore.peerMode === PeerOperationMode.Guest}
+                {#if $peerStore.peerChannelDetail && $peerStore.peerMode === PeerOperationMode.Guest}
                     <GuestModeStatus />
                 {/if}
 

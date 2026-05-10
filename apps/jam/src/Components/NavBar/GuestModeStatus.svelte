@@ -1,17 +1,13 @@
 <script lang="ts">
+	import { router } from '@/Router.svelte';
 	import { peerStore } from '@/Stores/PeerStore.svelte';
 
 	let show = $state(false);
 
 	function leaveChannel() {
 		setShow(false);
-
-		// TODO: Implement leave channel logic
-		// appState.updateStore({
-		// 	connectedChannelDetail: undefined,
-		// 	connectedUsers: [],
-		// 	currentSetId: undefined
-		// });
+		peerStore.leaveJam();
+		router.replace('Guest');
 	}
 
 	function setShow(value: boolean) {
@@ -36,30 +32,26 @@
 				<button onclick={() => setShow(false)} aria-label="Close">&times;</button>
 			</div>
 			<div class="status-body">
-				<!-- {#if appState.store.connectedUsers.length > 0}
-					<div class="band-section">
-						<strong>Band:</strong>
-						<ul class="band-list">
-							{#each appState.store.connectedUsers as user (user.userId)}
-								<li class="band-item">
-									{user.username} ({user.role})
-									{#if user.isBandLeader}
-										<span class="leader-badge">Leader</span>
-									{/if}
-								</li>
-							{/each}
-						</ul>
-						<button
-							class="leave-button"
-							onclick={leaveChannel}
-							aria-label="Leave band"
-						>
-							Leave Band
-						</button>
-					</div>
-				{:else}
-					<p>Not Connected</p>
-				{/if} -->
+				<div class="band-section">
+					<!-- <strong>Band:</strong>
+					<ul class="band-list">
+						{#each appState.store.connectedUsers as user (user.userId)}
+							<li class="band-item">
+								{user.username} ({user.role})
+								{#if user.isBandLeader}
+									<span class="leader-badge">Leader</span>
+								{/if}
+							</li>
+						{/each}
+					</ul> -->
+					<button
+						class="leave-button"
+						onclick={leaveChannel}
+						aria-label="Leave band"
+					>
+						Leave Band
+					</button>
+				</div>
 			</div>
 		</div>
 	</div>

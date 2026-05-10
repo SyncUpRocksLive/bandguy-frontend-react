@@ -64,81 +64,150 @@
 		return null;
 	});
 
+	let setlists = $derived.by(() => {
+		if (query.data && query.data.ok) {
+			return query.data.value.filter(set => set.songs.length > 0);
+		}
+
+		return [];
+	});
+
 </script>
 
-<div class="main-div">
-	<div class="inner-div">
-		{#if JamSetupDialog}
-			<JamSetupDialog />
-		{:else}
-			<!-- TODO: Clean this style up -->
-			{#if query.isLoading}
-				<div>Loading...</div>
-			{:else if errorMessage}
-				<div>Error: {errorMessage}</div>
-			{:else if query.data && query.data.ok}
-				{#each query.data.value as set (set.id)}
-					<div style="width: 200px; height: 100px; margin: 4px;">
-						<button class="btn btn-dark" onclick={() => playSet(set)}>
-							▶ {set.name} ({set.songs.length} songs) {getDuration(set)}
-						</button>
-					</div>
-				{/each}
+<section id="center">
+	<div class="studio-controls">
+		<div class="control-grid">
+			{#if JamSetupDialog}
+				<JamSetupDialog />
+			{:else}
+				<!-- TODO: Clean this style up -->
+				{#if query.isLoading}
+					<div>Loading...</div>
+				{:else if errorMessage}
+					<div>Error: {errorMessage}</div>
+				{:else if query.data && query.data.ok}
+					{#each setlists as set (set.id)}
+						<div class="control-item">
+							<div class="icon">
+								<svg fill="#f0f0f0" width="64px" height="64px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" stroke="#f0f0f0"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#CCCCCC" stroke-width="0.096"></g><g id="SVGRepo_iconCarrier"><path d="M7,20a1,1,0,0,1-1,1H2a1,1,0,0,1,0-2H6A1,1,0,0,1,7,20ZM6,15H2a1,1,0,0,0,0,2H6a1,1,0,0,0,0-2Zm0-4H2a1,1,0,0,0,0,2H6a1,1,0,0,0,0-2Zm8,8H10a1,1,0,0,0,0,2h4a1,1,0,0,0,0-2Zm0-4H10a1,1,0,0,0,0,2h4a1,1,0,0,0,0-2Zm0-4H10a1,1,0,0,0,0,2h4a1,1,0,0,0,0-2Zm0-4H10a1,1,0,0,0,0,2h4a1,1,0,0,0,0-2Zm0-4H10a1,1,0,0,0,0,2h4a1,1,0,0,0,0-2Zm8,16H18a1,1,0,0,0,0,2h4a1,1,0,0,0,0-2Zm0-4H18a1,1,0,0,0,0,2h4a1,1,0,0,0,0-2Z"></path></g></svg>
+							</div>
+							<h4>{set.name}</h4>
+							<p>
+								({set.songs.length} songs) {getDuration(set)}
+							</p>
+							<button
+								class="control-btn"
+								onclick={() => playSet(set)}>
+								▶ Play
+							</button>
+						</div>
+					{/each}
+				{/if}
 			{/if}
-		{/if}
+		</div>
 	</div>
-</div>
+</section>
 
 <style>
-	.main-div {
+	section {
+		grid-area: center;
 		flex: 1;
 		display: flex;
 		flex-direction: column;
 		margin: 1px;
 		padding: 5px;
 		overflow-y: auto;
-		overflow: hidden !important; 
+		/* overflow: hidden !important;  */
 		overscroll-behavior: none;
 	}
 
-	.inner-div {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		background: rgba(0,0,0,.5);
-		padding: 10px;
-		color: white;
+	.studio-controls {
+		text-align: center;
+		max-width: 1000px;
+		margin: 0 auto;
+	}
+
+	.control-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+		gap: 2rem;
+		max-width: 1000px;
+		margin: 0 auto;
 		overflow-y: auto;
 	}
 
-	.btn {
-		display: inline-block;
-		font-weight: 400;
-		line-height: 1.5;
+	.control-item {
+		background: rgba(33, 53, 71, 0.8);
+		border: 1px solid rgba(100, 150, 200, 0.3);
+		border-radius: 12px;
+		padding: 2rem;
+		transition: all 0.3s ease;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
 		text-align: center;
-		text-decoration: none;
-		vertical-align: middle;
+	}
+
+	.control-item:hover {
+		border-color: #6b9ec4;
+		background: rgba(33, 53, 71, 0.95);
+		transform: translateY(-2px);
+	}
+
+	.icon {
+		font-size: 3rem;
+		margin-bottom: 1rem;
+		opacity: 0.9;
+	}
+
+	.control-item h4 {
+		font-size: 1.4rem;
+		margin-bottom: 0.5rem;
+		color: #e0e0e0;
+	}
+
+	.control-item p {
+		font-size: 0.9rem;
+		color: #a0a0a0;
+		margin-bottom: 1.5rem;
+		line-height: 1.4;
+		flex-grow: 1;
+	}
+
+	.control-btn {
+		background: #239fc4;
+		color: #ffffff;
+		border: none;
+		padding: 0.75rem 1.5rem;
+		border-radius: 6px;
+		font-size: 0.9rem;
+		font-weight: 600;
 		cursor: pointer;
-		-webkit-user-select: none;
-		-moz-user-select: none;
-		user-select: none;
-		background-color: transparent;
-		border: 1px solid transparent;
-		padding: .35rem .75rem;
-		font-size: 1rem;
-		border-radius: 5px;
-		transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+		transition: all 0.2s ease;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
 	}
 
-	.btn-dark {
-		color: #fff;
-		background-color: #1f3040;
-		border-color: #343a40;
+	.control-btn:hover:not(:disabled) {
+		background: #1a7a9a;
+		transform: translateY(-1px);
 	}
 
-	.btn:hover {
-		color: #fff;
-		background-color: #23272b;
-		border-color: #1d2124;
+	.control-btn:disabled {
+		background: #555555;
+		cursor: not-allowed;
+		opacity: 0.6;
 	}
+
+	@media (max-width: 768px) {
+		.control-grid {
+			grid-template-columns: 1fr;
+			gap: 1.5rem;
+		}
+
+		.control-item {
+			padding: 1.5rem;
+		}
+	}
+
 </style>
