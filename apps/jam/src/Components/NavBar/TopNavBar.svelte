@@ -10,6 +10,7 @@
 	import GuestModeStatus from './GuestModeStatus.svelte';
 	import UserProfile from './UserProfile.svelte';
 	import TopNavBadge from './TopNavBadge.svelte';
+	import FullscreenMode from './FullscreenMode.svelte';
 
 	let isMenuOpen = $state(false); // Toggle state
 
@@ -47,13 +48,16 @@
 
                 <Configuration />
                 
-				<UserProfile />
+				<FullscreenMode />
             </div>
 		</div>
 
 		<!-- Mobile/Popup Menu Drawer -->
         {#if isMenuOpen}
             <nav class="mobile-menu" transition:slide={{ duration: 250 }}>
+				<div style="border-bottom: 1px solid #333; padding: 10px 20px; color: #f0f0f0;">
+					<UserProfile />
+				</div>
                 <a href="/" onclick={closeMenu}>HOME</a>
                 <a href="/mixingroom" onclick={closeMenu}>MIXING ROOM</a>
                 <a href="#/" onclick={(e) => { 

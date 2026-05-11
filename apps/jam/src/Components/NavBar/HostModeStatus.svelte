@@ -36,10 +36,13 @@
 	<div class="status-overlay" onclick={() => setShow(false)} onkeydown={(e) => { if (e.key === 'Escape') setShow(false); }} role="dialog" aria-modal="true" tabindex="-1">
 		<div class="status-popover" onclick={(e) => e.stopPropagation()}>
 			<div class="status-header">
-				<h4>Band Leader(s) TODO</h4>
+				<h4>Jam Name {$peerStore.peerChannelDetail?.friendlyName ?? ''}</h4>
 				<button onclick={() => setShow(false)} aria-label="Close">&times;</button>
 			</div>
 			<div class="status-body">
+				<div class="bandmates-section">
+					<strong>Master: </strong> {$peerStore.peerChannelDetail?.hostUser ?? ''}
+				</div>
 				<div class="bandmates-section">
 					<strong>Bandmates:</strong>
 					<!-- {#if appState.store.connectedUsers.length > 0}
