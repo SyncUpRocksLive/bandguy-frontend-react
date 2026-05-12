@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { slide } from 'svelte/transition';
-	import { auth } from '@/Auth.svelte';
+	import { auth } from "@shared/ui/stores/Auth.svelte";
 	import { router } from '@/Router.svelte';
 	import { syncStore } from '@/Stores/SyncStore.svelte';
 	import { peerStore } from "@/Stores/PeerStore.svelte"

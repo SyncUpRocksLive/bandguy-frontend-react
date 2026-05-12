@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { QueryClientProvider } from "@tanstack/svelte-query";
-	import { auth } from "./Auth.svelte";
+	import { auth } from "@shared/ui/stores/Auth.svelte";
 	import { router } from "./Router.svelte";
-	import Login from "./Components/User/Login.svelte";
+	import Login from "@shared/ui/components/Login.svelte";
 	import Home from "./Components/Area/Home.svelte";
 	import SetList from "./Components/Area/SetList.svelte";
 	import SetView from "./Components/Area/SetView.svelte";
