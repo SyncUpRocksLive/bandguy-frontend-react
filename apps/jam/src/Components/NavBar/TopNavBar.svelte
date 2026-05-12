@@ -32,6 +32,8 @@
                 <div class="bar" class:open={isMenuOpen}></div>
             </button>
 
+
+
 			{#if $syncStore.songPlayStatus !== SongPlayStatus.Stop}
 				<TopNavBadge />
 			{/if}
@@ -58,19 +60,20 @@
 				<div style="border-bottom: 1px solid #333; padding: 10px 20px; color: #f0f0f0;">
 					<UserProfile />
 				</div>
-                <a href="/" onclick={closeMenu}>HOME</a>
-                <a href="/mixingroom" onclick={closeMenu}>MIXING ROOM</a>
+                
                 <a href="#/" onclick={(e) => { 
 					router.linkTo('Home').onclick(e); 
 					closeMenu(); 
-				}}>JAM</a>
+				}}>JAM ROOM</a>
+
+				<a href="/mixingroom" onclick={closeMenu}>MIXING ROOM</a>
 
 				<!-- TODO: this will not work if page is reloaded on current page. Need to check current route -->
 				{#if $peerStore.peerMode !== PeerOperationMode.None}
 					<a href="#/" onclick={(e) => { 
 						router.back();
 						closeMenu(); 
-					}}>BACK</a>
+					}}>&lt; BACK</a>
 				{/if}
             </nav>
         {/if}
