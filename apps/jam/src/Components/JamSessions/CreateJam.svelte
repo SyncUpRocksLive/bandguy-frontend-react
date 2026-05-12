@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { createMutation } from '@tanstack/svelte-query';
-	import { auth } from '@/Auth.svelte';
+	import { auth } from "@shared/ui/stores/Auth.svelte";
 	import { peerStore } from "@/Stores/PeerStore.svelte";
 	import { JamChannels, type JamChannelDetail } from '@shared/services/syncuprocks/musician/JamChannels';
 	import { LogError, LogInfo } from '@shared/services/Logger';

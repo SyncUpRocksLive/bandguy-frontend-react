@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { auth } from '../../Auth.svelte';
+	import { auth } from "@shared/ui/stores/Auth.svelte";
 	import { onMount } from 'svelte';
 
 	let isFullscreen = $state(false);

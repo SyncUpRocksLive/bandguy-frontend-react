@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { createQuery } from '@tanstack/svelte-query';
 	import { router } from '@/Router.svelte';
-	import { auth } from '@/Auth.svelte';
+	import { auth } from "@shared/ui/stores/Auth.svelte";
 	import { peerStore } from "@/Stores/PeerStore.svelte"
 	import { Log } from '@shared/services/Logger';
 	import { getSetsOverview } from '@shared/services/syncuprocks/musician/Api';

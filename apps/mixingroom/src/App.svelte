@@ -1,8 +1,8 @@
 <script lang="ts">
 	// Main mixing room components will be added here
 	import Header from "./Header.svelte";
-	import { auth } from "./Auth.svelte";
-	import Login from "./Areas/Components/Login/Login.svelte";
+	import { auth } from "@shared/ui/stores/Auth.svelte";
+	import Login from "@shared/ui/components/Login.svelte";
 	import { router } from "./Router.svelte";
 </script>
 
