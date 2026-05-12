@@ -1,33 +1,7 @@
 <script lang="ts">
 	import { auth } from '../../Auth.svelte';
-	import { onMount } from 'svelte';
 
 	let show = $state(false);
-	let isFullscreen = $state(false);
-
-	onMount(() => {
-		function onFullscreenChange() {
-			isFullscreen = Boolean(document.fullscreenElement);
-			show = false;
-		}
-
-		if (document.fullscreenElement) {
-			isFullscreen = true;
-		}
-
-		document.addEventListener('fullscreenchange', onFullscreenChange);
-
-		return () => document.removeEventListener('fullscreenchange', onFullscreenChange);
-	});
-
-	function toggleFullscreen() {
-		if (!isFullscreen) {
-			document.body.requestFullscreen();
-		} else {
-			document.exitFullscreen();
-		}
-		show = false;
-	}
 
 	function logout() {
 		show = false;
@@ -62,13 +36,6 @@
 						<span class="username">@{auth.user.username}</span>
 					</div>
 					<div class="profile-actions">
-						<button
-							class="action-button"
-							onclick={toggleFullscreen}
-							aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
-						>
-							{isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
-						</button>
 						<button
 							class="action-button logout-button"
 							onclick={logout}

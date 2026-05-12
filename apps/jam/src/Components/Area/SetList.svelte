@@ -66,7 +66,7 @@
 
 	let setlists = $derived.by(() => {
 		if (query.data && query.data.ok) {
-			return query.data.value.filter(set => set.songs.length > 0);
+			return query.data.value.filter(set => set.songs.length > 0).sort((a, b) => a.name.localeCompare(b.name));
 		}
 
 		return [];
