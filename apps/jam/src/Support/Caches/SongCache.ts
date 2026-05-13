@@ -67,8 +67,11 @@ export function CreateSongCache():ISongCache {
 
 				// Create an objectStore for this database
 				if (e.newVersion === 2) {
-					//const objectStore =
-					db.deleteObjectStore('trackData');
+					// If having old version, prune the old db now
+					if (db.objectStoreNames.contains('trackData')) {
+						db.deleteObjectStore('trackData');
+					}
+
 					db.createObjectStore('trackData', { keyPath: ['songId', 'trackId', 'version'] });
 					//objectStore.createIndex('blob', 'blob', { unique: false });
 				}
