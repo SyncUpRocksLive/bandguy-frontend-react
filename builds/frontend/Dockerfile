@@ -13,8 +13,11 @@ COPY tsconfig*.json ./
 # 2. Copy the workspace app files (Important: Keep the structure!)
 COPY apps/jam/package*.json ./apps/jam/
 COPY apps/jam/tsconfig*.json ./apps/jam/
+COPY apps/jam/svelte.config.js ./apps/jam/
 COPY apps/mixingroom/package*.json ./apps/mixingroom/
 COPY apps/mixingroom/tsconfig*.json ./apps/mixingroom/
+COPY apps/mixingroom/svelte.config.js ./apps/mixingroom/
+
 
 # 3. Install ALL dependencies (don't ignore scripts yet, we need the .bin folder)
 # We use --include=dev because we need 'tsc' and 'vite' to build
@@ -34,6 +37,8 @@ COPY apps/mixingroom/vite.config.ts ./apps/mixingroom/
 COPY apps/mixingroom/index.html ./apps/mixingroom/
 
 COPY packages/ ./packages/
+
+# RUN ls -R ./apps/jam/src/
 
 RUN npm run build --workspaces
 

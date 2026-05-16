@@ -1,5 +1,5 @@
 import { Lyric, Line, Word, LyricFormatVersion } from './Lyrics';
-import { Log, LogError, LogObject } from '@shared/services/Logger';
+import { LogError, LogObject } from '@shared/services/Logger';
 
 function parseLegacy(lyric: Lyric, lyricLine: string, timePositions:number[]) {
 	lyricLine = lyricLine.trim();
@@ -24,13 +24,14 @@ function parseExtended(lyric: Lyric, lyricLine: string, lineTime:number) {
 
 	// If extended, seperator would be <> otherwise, would be {,} and we have chords
 	// other than that, same process - support either.
-	const regex = new RegExp('[<{]\\d{2}:\\d{2}.\\d{2,}?(,[A-Za-z 0-9#/]+)?[}>]', 'g');
 	let match: RegExpExecArray | null;
 
 	let groupNumber = -1;
 	let lastIndex = -1;
 
-	while ((match = regex.exec(lyricLine)) != null) {
+	const regexParseExtended = new RegExp('[<{]\\d{2}:\\d{2}.\\d{2,}?(,[A-Za-z 0-9#/]+)?[}>]', 'g');
+
+	while ((match = regexParseExtended.exec(lyricLine)) != null) {
 		// There is a slice of text between line time and first sub word time - capture it
 		if (lastIndex < 0 && match.index > 0) {
 			const firstWord = lyricLine.slice(0, match.index);
@@ -68,9 +69,7 @@ function parseExtended(lyric: Lyric, lyricLine: string, lineTime:number) {
 		// We capture a lyric when we encounter the next {}/<>, so, track the last groupIndex
 		if (lastIndex >= 0) {
 			const wordText = lyricLine.slice(lastIndex, match.index);
-			if (wordText.length > 0) {
-				words[groupNumber].text = wordText;
-			}
+			words[groupNumber].text = wordText;
 		}
 
 		++groupNumber;
@@ -85,18 +84,16 @@ function parseExtended(lyric: Lyric, lyricLine: string, lineTime:number) {
 			duration: 0
 		});
 	}
-	else if (lastIndex < lyricLine.length) {
+	else if (lastIndex <= lyricLine.length) {
 		// Handle remaining text
 		const wordText = lyricLine.slice(lastIndex, lyricLine.length);
-		if (wordText.length > 0) {
-			words[groupNumber].text = wordText;
-		}
+		words[groupNumber].text = wordText;
 	}
 
 	// TODO: We should verify words times are in order. Not less then line time
 
 	lyric.lines.push({
-		text: words.filter(x => x.text.length > 0).map(x => x.text).join(''),
+		text: words.map(x => x.text || '').join(''),
 		words: words,
 		time: lineTime,
 		duration: 0
@@ -173,7 +170,8 @@ function sortLines(lines:Line[]) {
 }
 
 function getType(text:string) {
-	if (new RegExp('{\\d{2}:\\d{2}(.\\d{2,})?,[A-Za-z 0-9#/]+}', 'g').test(text)) {
+	const regexGetType = new RegExp('{\\d{2}:\\d{2}(.\\d{2,})?,[A-Za-z 0-9#/]+}', 'g');
+	if (regexGetType.test(text)) {
 		return LyricFormatVersion.Chords;
 	}
 

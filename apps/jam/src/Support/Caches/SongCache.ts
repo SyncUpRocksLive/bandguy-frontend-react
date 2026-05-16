@@ -1,0 +1,134 @@
+const Log = console.log;
+const LogError = console.error;
+const LogInfo = console.info;
+
+export interface SongBlob {
+	songId: number;
+	trackId: number;
+	version: number;
+	format: string;
+	timestamp: number;
+	data: Blob;
+}
+
+export interface ISongCache {
+	// Does not need to be called explicitly.
+	initialize:() => Promise<undefined>;
+	exists:(songId: number, trackId: number, version: number) => Promise<boolean>;
+	get:(songId: number, trackId: number, version: number) => Promise<SongBlob | undefined>;
+	put:(song: SongBlob) => Promise<undefined>;
+	vacuum:() => Promise<undefined>;
+}
+
+interface SongStoreDatabase {
+	database?: IDBDatabase;
+}
+
+const _songStoreCache: SongStoreDatabase = {};
+
+export function CreateSongCache():ISongCache {
+	const initialize = (): Promise<undefined> => {
+		return new Promise<undefined>((resolve, reject) => {
+			// Already open?
+			if (_songStoreCache.database) {
+				resolve(undefined);
+				return;
+			}
+
+			const indexDb = window.indexedDB;
+			if (!indexDb) {
+				LogError('indexedDB not supported');
+				reject('indexedDB not supported');
+				return;
+			}
+
+			Log('verbose', 'Opening songstore db...2');
+			const request = indexDb.open('songstore', 2);
+			request.onsuccess = () => {
+				Log('verbose', 'songstore Opened');
+				_songStoreCache.database = request.result;
+
+				_songStoreCache.database.onerror = () => {
+					LogError(`songstore error: ${request.error}`);
+				}
+
+				resolve(undefined);
+			};
+
+			request.onerror = () => {
+				LogError(`songstore open error: ${request.error}`);
+				reject(request.error);
+			};
+
+			request.onupgradeneeded = (e) => {
+				LogInfo(`songstore upgrade Needed ${e.oldVersion} -> ${e.newVersion}`);
+				// Save the IDBDatabase interface
+				const db = request.result;
+
+				// Create an objectStore for this database
+				if (e.newVersion === 2) {
+					// If having old version, prune the old db now
+					if (db.objectStoreNames.contains('trackData')) {
+						db.deleteObjectStore('trackData');
+					}
+
+					db.createObjectStore('trackData', { keyPath: ['songId', 'trackId', 'version'] });
+					//objectStore.createIndex('blob', 'blob', { unique: false });
+				}
+			};
+		});
+	};
+
+	const exists = (songId: number, trackId: number, version: number): Promise<boolean> => {
+		return new Promise<boolean>((resolve, reject) => {
+			initialize().then(() => {
+				try {
+					const transaction = _songStoreCache.database!.transaction('trackData', 'readonly');
+					const count = transaction.objectStore('trackData').count([songId, trackId, version]);
+					count.onsuccess = () => { resolve(count.result > 0); }
+					count.onerror = () => { reject('Error: ' + count.error); }
+				} catch (error) {
+					console.log(error);
+					Log('error', `Error checking exists: ${error}`);
+					resolve(false);
+				}
+			});
+		});
+	};
+
+	const get = async (songId: number, trackId: number, version: number): Promise<SongBlob | undefined> => {
+		return new Promise<SongBlob | undefined>((resolve, reject) => {
+			initialize().then(() => {
+				const transaction = _songStoreCache.database!.transaction('trackData', 'readwrite');
+				const get = transaction.objectStore('trackData').get([songId, trackId, version]);
+				get.onsuccess = () => { resolve(get.result); }
+				get.onerror = () => { reject('Error: ' + get.error); }
+			});
+		});
+	};
+
+	const put = async (song: SongBlob): Promise<undefined> => {
+		return new Promise<undefined>((resolve, reject) => {
+			initialize().then(() => {
+				const transaction = _songStoreCache.database!.transaction('trackData', 'readwrite');
+				const put = transaction.objectStore('trackData').put(song);
+				put.onsuccess = () => { resolve(undefined); }
+				put.onerror = () => { reject('Error: ' + put.error); }
+			});
+		});
+	};
+
+	const vacuum = async (): Promise<undefined> => {
+		return new Promise<undefined>((resolve, reject) => {
+			initialize().then(() => {
+				const transaction = _songStoreCache.database!.transaction('trackData', 'readwrite');
+				// TODO: Loop through keys:
+				// 	where multiple versions, prune old versions of songs
+				//  remove songs not accessed in last 30 days
+				// We need to add a second table (songMetadata - and write last accessed time to that table everytime song get called)
+			});
+		});
+	}
+
+	return { initialize, exists, get, put, vacuum };
+}
