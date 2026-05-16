@@ -1,15 +1,15 @@
 <script lang="ts">
 	// Main mixing room components will be added here
-	import Header from "./lib/Header.svelte";
-	import { auth } from "./auth.svelte";
-	import Login from "./lib/areas/components/login/Login.svelte";
+	import Header from "./Header.svelte";
+	import { auth } from "@shared/ui/stores/Auth.svelte";
+	import Login from "@shared/ui/components/Login.svelte";
 	import { router } from "./Router.svelte";
 </script>
 
 <Header />
 
 {#if auth.isAuthenticated}
-	{#await import(`./lib/areas/${router.route.area}.svelte`)}
+	{#await import(`./Areas/${router.route.area}.svelte`)}
 		<!-- only show loading spinner if taking > 4 secs... -->
 	{:then module}
 		<svelte:component this={module.default} params={router.route.params} />

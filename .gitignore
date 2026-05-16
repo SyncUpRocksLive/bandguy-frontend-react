@@ -2,6 +2,7 @@ public/jam/
 public/mixingroom/
 public/profile/
 public/song_editor/
+public/**
 
 *.lrc
 *.mp3
@@ -166,3 +167,4 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+TODO.md
