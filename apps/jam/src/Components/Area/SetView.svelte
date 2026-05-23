@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { onDestroy } from 'svelte';
-	import { createQuery } from '@tanstack/svelte-query';
-	import { syncStore } from '@/Stores/SyncStore.svelte';
-	import { SongPlayStatus } from '@/Types/Types';
-	import { LogInfo, LogVerbose } from '@shared/services/Logger';
-	import SongView from '@/Components/SongPlayback/SongView.svelte';
-	import { getSetComplete } from '@shared/services/syncuprocks/musician/Api';
-	import type { Song } from '@shared/services/syncuprocks/musician/Types';
+	import { onDestroy } from "svelte";
+	import { createQuery } from "@tanstack/svelte-query";
+	import { syncStore } from "@/Stores/SyncStore.svelte";
+	import { SongPlayStatus } from "@/Types/Types";
+	import { LogInfo, LogVerbose } from "@shared/services/Logger";
+	import SongView from "@/Components/SongPlayback/SongView.svelte";
+	import { getSetComplete } from "@shared/services/syncuprocks/musician/Api";
+	import type { Song } from "@shared/services/syncuprocks/musician/Types";
 
 	interface Props {
 		setId: number;
@@ -15,15 +15,17 @@
 	let { setId }: Props = $props();
 
 	const query = createQuery(() => ({
-		queryKey: ['setlist', $syncStore.currentSetId],
+		queryKey: ["setlist", $syncStore.currentSetId],
 		queryFn: async () => {
 			if (!$syncStore.currentSetId) return null;
-			LogVerbose(`Downloading set overview for setId=${$syncStore.currentSetId}`);
+			LogVerbose(
+				`Downloading set overview for setId=${$syncStore.currentSetId}`,
+			);
 			return await getSetComplete($syncStore.currentSetId, false);
 		},
 		refetchInterval: false,
 		staleTime: 0,
-		refetchOnMount: 'always',
+		refetchOnMount: "always",
 		refetchOnWindowFocus: false,
 		enabled: !!$syncStore.currentSetId,
 	}));
@@ -34,11 +36,12 @@
 			return;
 		}
 
-		syncStore.updateState({ 
-			currentSongId: song.id, 
-			currentSong: song, 
+		syncStore.updateState({
+			currentSongId: song.id,
+			currentSong: song,
 			playbackTimeMilliseconds: 0,
-			songPlayStatus: SongPlayStatus.Play });
+			songPlayStatus: SongPlayStatus.Play,
+		});
 
 		// TODO: Only load tracks we want to see - provide filter to limit
 		syncStore.ensureCurrentSongLoaded();
@@ -53,16 +56,23 @@
 	}
 
 	function nextSong() {
-		if (query.isLoading || !query.data || !query.data.ok || query.data.value.songs.length === 0) {
+		if (
+			query.isLoading ||
+			!query.data ||
+			!query.data.ok ||
+			query.data.value.songs.length === 0
+		) {
 			LogInfo("No Valid State");
 			return;
 		}
 
-		let nextSong: Song | undefined = undefined; 
+		let nextSong: Song | undefined = undefined;
 		if (!$syncStore.currentSong) {
 			nextSong = query.data.value.songs[0];
 		} else {
-			const currentIndex = query.data.value.songs.indexOf($syncStore.currentSong);
+			const currentIndex = query.data.value.songs.indexOf(
+				$syncStore.currentSong,
+			);
 			if (currentIndex < 0) {
 				nextSong = query.data.value.songs[0];
 			} else if (currentIndex + 1 >= query.data.value.songs.length) {
@@ -80,20 +90,20 @@
 
 	// Update state
 	$effect(() => {
-		syncStore.updateState({currentSetId: setId})
+		syncStore.updateState({ currentSetId: setId });
 	});
 
 	onDestroy(() => {
-		LogInfo('SetView::onDestroy: Cleaning up syncstore state')
+		LogInfo("SetView::onDestroy: Cleaning up syncstore state");
 		syncStore.updateState({
 			currentSetId: undefined,
 			currentSongId: undefined,
 			currentSong: undefined,
 			currentSongMarkers: undefined,
 			playbackTimeMilliseconds: 0,
-			songPlayStatus: SongPlayStatus.Stop
+			songPlayStatus: SongPlayStatus.Stop,
 		});
-  	});
+	});
 
 	const errorMessage = $derived.by(() => {
 		if (!query.isLoading) {
@@ -105,10 +115,26 @@
 				return query.data.error ?? "Unknown Error";
 			}
 		}
-	
+
 		return undefined;
 	});
 
+	function scrollIfActive(node: HTMLElement, isActive: boolean) {
+		if (isActive) {
+			node.scrollIntoView({ behavior: "smooth", block: "nearest" });
+		}
+
+		return {
+			update(nextActive: boolean) {
+				if (nextActive) {
+					node.scrollIntoView({
+						behavior: "smooth",
+						block: "nearest",
+					});
+				}
+			},
+		};
+	}
 </script>
 
 <div class="set-view">
@@ -123,7 +149,8 @@
 				<div class="controls">
 					<button
 						class="control-btn play-btn"
-						class:pulse={$syncStore.songPlayStatus === SongPlayStatus.Play}
+						class:pulse={$syncStore.songPlayStatus ===
+							SongPlayStatus.Play}
 						onclick={playSong}
 						title="Start playing"
 					>
@@ -136,11 +163,7 @@
 					>
 						⏸
 					</button>
-					<button
-						class="control-btn"
-						onclick={nextSong}
-						title="Next"
-					>
+					<button class="control-btn" onclick={nextSong} title="Next">
 						⏭
 					</button>
 				</div>
@@ -151,11 +174,14 @@
 							<li>
 								<button
 									class="song-btn"
-									class:active={$syncStore.currentSongId === song.id}
+									class:active={$syncStore.currentSongId ===
+										song.id}
+									use:scrollIfActive={$syncStore.currentSongId ===
+										song.id}
 									onclick={() => loadSong(song)}
-									title={`Play ${song.name || '?'}`}
+									title={`Play ${song.name || "?"}`}
 								>
-									▶ {song.name || '?'}
+									▶ {song.name || "?"}
 								</button>
 							</li>
 						{/each}
@@ -166,9 +192,7 @@
 			<!-- Main content area -->
 			<div class="main-content">
 				{#if $syncStore.currentSongId}
-					<SongView
-						song={$syncStore.currentSong!}
-					/>
+					<SongView song={$syncStore.currentSong!} />
 				{:else}
 					<div class="no-song">Select a song to begin</div>
 				{/if}
@@ -187,12 +211,12 @@
 		display: flex;
 		flex-direction: column; */
 		flex: 1;
-		display: flex; 
-		flex-direction: column; 
+		display: flex;
+		flex-direction: column;
 		background-color: rgba(0, 255, 255, 0.132);
-		padding: 0; 
-		color: white; 
-		overflow: hidden !important; 
+		padding: 0;
+		color: white;
+		overflow: hidden !important;
 		overscroll-behavior: none;
 	}
 
@@ -209,7 +233,7 @@
 		flex-direction: column;
 		border-right: 1px solid rgba(255, 255, 255, 0.3);
 		overflow-y: auto;
-    	scrollbar-gutter: stable;
+		scrollbar-gutter: stable;
 	}
 
 	.controls {
@@ -239,9 +263,15 @@
 	}
 
 	@keyframes pulse {
-		0% { opacity: 1; }
-		50% { opacity: 0.7; }
-		100% { opacity: 1; }
+		0% {
+			opacity: 1;
+		}
+		50% {
+			opacity: 0.7;
+		}
+		100% {
+			opacity: 1;
+		}
 	}
 
 	.song-list {
@@ -273,7 +303,7 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		border-radius: 0;
-		opacity: .4;
+		opacity: 0.4;
 	}
 
 	.song-btn:hover {
@@ -283,7 +313,7 @@
 
 	.song-btn.active {
 		background-color: rgba(100, 100, 200, 0.8);
-		opacity: .8;
+		opacity: 0.8;
 	}
 
 	.main-content {

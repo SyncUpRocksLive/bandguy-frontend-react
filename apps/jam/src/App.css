@@ -9,6 +9,14 @@
   box-sizing: border-box;
 }
 
+html {
+  /* Syntax: scrollbar-color: [thumb-color] [track-color]; */
+  scrollbar-color: #3161ff5d #1e1e24;
+  
+  /* Options: auto | thin | none */
+  scrollbar-width: thin; 
+}
+
 body {
   height: 100vh;
   width: 100vw;
