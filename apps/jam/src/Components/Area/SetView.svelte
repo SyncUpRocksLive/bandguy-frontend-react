@@ -227,17 +227,16 @@
 	}
 
 	.sidebar {
-		width: 200px;
+		width: 220px;
 		background: rgba(0, 0, 0, 0.8);
 		display: flex;
 		flex-direction: column;
 		border-right: 1px solid rgba(255, 255, 255, 0.3);
-		overflow-y: auto;
-		scrollbar-gutter: stable;
+		overflow-y: hidden;
 	}
 
 	.controls {
-		padding: 10px;
+		padding: 5px;
 		border-bottom: 1px solid rgba(255, 255, 255, 0.3);
 		display: flex;
 		gap: 5px;
@@ -277,7 +276,7 @@
 	.song-list {
 		flex: 1;
 		overflow-y: auto;
-		padding: 10px 0;
+		padding: 5px;
 	}
 
 	.song-list ul {
